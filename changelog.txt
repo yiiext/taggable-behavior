@@ -1,0 +1,38 @@
+1.0
+[*] More PHPDoc documentation.
+[*] Fixed possible cache keys overlap when using multiple tag sets with one model.
+
+0.9
+Warning: this version is not compatible with Yii 1.0.
+
+[+] Added resetAllTagsCache() and resetAllTagsWithModelsCountCache().
+[*] Fixed getAllTags() and getAllTagsWithModelsCount() cache issues.
+[*] Now tags are saved on save() only if they were changed. 
+[*] Extension is now compatible only with Yii 1.1.
+[*] Fixed saving empty tags.
+[*] Fixed caching.
+
+0.8
+Warning: this version is not backwards compatible to 0.6.
+
+[+] Now you can set tagId field name for binding table.
+[*] Do not try to delete tag bindings when inserting new record.
+[+] Added taggedWith() alias withTags().
+[-] Removed getCountByTags(), findAllByTags(). Use taggedWith(). 
+[+] Method chaining: $post->addTags("yii, php")->save();
+[+] New syntax: $posts = Post::model()->taggedWith(array('php', 'yii'))->findAll(); 
+[*] Added parent:: calls in event handlers.
+[+] Added hasTags() and it's alias hasTag() to check if all tags specified are attached to current model.
+[+] New syntax: echo $post->tags (or by what name behaviour is attached) will print comma separated tags.
+[*] getTags now returns array since implode is really easy to do yourself.
+[-] Removed getTagsArray().
+[*] addTags(), removeTags(), setTags() are now accept both string and array.
+[+] Added addTag() as alias of addTags(), removeTag() as alias of removeTags().
+[*] Some methods are now protected.
+[*] Added $with to findAllByTags().
+[+] getAllTags().
+[+] Unit tests.
+[+] createTagsAutomatically option allows to throw exception when adding nonexisting tag. 
+
+0.6
+[+] Initial public release.

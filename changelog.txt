@@ -1,3 +1,6 @@
+1.0.1
+[*] New naming conventions.
+
 1.0
 [*] More PHPDoc documentation.
 [*] Fixed possible cache keys overlap when using multiple tag sets with one model.

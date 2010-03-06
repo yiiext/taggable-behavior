@@ -1,4 +1,4 @@
-CTaggableBehaviour
+Taggable Behaviour
 ==================
 
 Allows active record model to manage tags.
@@ -14,7 +14,7 @@ In your ActiveRecord model define `behaviors()` method:
 function behaviors() {
     return array(
         'tags' => array(
-            'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehaviour',
             // Table where tags are stored
             'tagTable' => 'Tag',
             // Cross-table that stores tag-model connections.

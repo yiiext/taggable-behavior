@@ -1,4 +1,4 @@
-CTaggableBehaviour
+Taggable Behaviour
 ==================
 
 Позволяет модели работать с тегами.
@@ -14,7 +14,7 @@ CTaggableBehaviour
 function behaviors() {
     return array(
         'tags' => array(
-            'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehaviour',
             // Имя таблицы для хранения тегов 
             'tagTable' => 'Tag',
             // Имя кросс-таблицы, связывающей тег с моделью.

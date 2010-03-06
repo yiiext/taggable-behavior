@@ -4,11 +4,11 @@
  *
  * Provides tagging ability for a model.
  *
- * @version 1.0
+ * @version 1.0.1
  * @author Alexander Makarov
- * @link http://yiiframework.ru/forum/viewtopic.php?f=9&t=389
+ * @link http://code.google.com/p/yiiext/
  */
-class CTaggableBehaviour extends CActiveRecordBehavior {
+class ETaggableBehaviour extends CActiveRecordBehavior {
     /**
      * Tags table name
      */

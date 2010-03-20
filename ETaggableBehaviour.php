@@ -4,7 +4,7 @@
  *
  * Provides tagging ability for a model.
  *
- * @version 1.0.1
+ * @version 1.0.2
  * @author Alexander Makarov
  * @link http://code.google.com/p/yiiext/
  */
@@ -77,7 +77,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      *
      * @return string
      */
-    function __toString(){
+    function toString(){
         $this->loadTags();
         return implode(', ', $this->tags);
     }
@@ -416,7 +416,13 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      * @return string
      */
     private function getCacheKey(){
-        return 'Taggable'.$this->getOwner()->tableName().$this->tagTable.$this->getOwner()->primaryKey;
+        return 'Taggable'.
+                $this->getOwner()->tableName().
+                $this->tagTable.
+                $this->tagBindingTable.
+                $this->modelTableFk.
+                $this->tagBindingTableTagId.                
+                $this->getOwner()->primaryKey;
     }
 
     /**

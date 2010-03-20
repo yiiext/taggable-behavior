@@ -1,9 +1,14 @@
+next
+[+] New manual section: using taggable with CAutoComplete.
+[*] Renamed __toString to toString since magic was hard to debug in case of failure.
+[*] Fixed more possible cache keys overlap when using multiple tag sets within one model.
+
 1.0.1
 [*] New naming conventions.
 
 1.0
 [*] More PHPDoc documentation.
-[*] Fixed possible cache keys overlap when using multiple tag sets with one model.
+[*] Fixed possible cache keys overlap when using multiple tag sets within one model.
 
 0.9
 Warning: this version is not compatible with Yii 1.0.

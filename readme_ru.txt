@@ -137,7 +137,7 @@ $postCount = Post::model()->taggedWith('php, yii')->count();
 ~~~
 [php]
 $post->addTags('new1, new2')->save();
-echo $post->tags;
+echo $post->tags->toString();
 ~~~
 
 Использование нескольких групп тегов
@@ -213,18 +213,39 @@ $soft->os->addTag("Windows");
 $soft->save();
 ~~~
 
-Автодополнение для контроллера
-------------------------------
+Использование с CAutoComplete
+-----------------------------
 
 ~~~
 [php]
-public function actions(){
-    return array(
-        'autocomplete_tags' => array(
-            'class' => 'application.extensions.CTaggableBehaviour.CTaggableAutocompleteAction',
-            'x' => 'y',
-        )
-    );
-}
+<?$this->widget('CAutoComplete', array(
+	'name' => 'tags',
+	'value' => $model->tags->toString(),
+	'url'=>'/autocomplete/tags', //путь к URL для дополнения тегов
+	'multiple'=>true,
+	'mustMatch'=>false,
+	'matchCase'=>false,
+)) ?>
 ~~~
 
+Сохранение тегов будет выглядеть так:
+~~~
+[php]
+function actionUpdate(){
+	$model = Post::model()->findByPk($_GET['id']);
+
+	if(isset($_POST['Post'])){
+		$model->attributes=$_POST['Post'];
+		$model->setTags($_POST['tags']);
+
+		// если у вас более одной группы тегов:
+		// $model->tags1->setTags($_POST['tags1']);
+		// $model->tags1->setTags($_POST['tags2']);
+
+		if($model->save()) $this->redirect(array('index'));
+	}
+	$this->render('update',array(
+		'model'=>$model,
+	));
+}
+~~~

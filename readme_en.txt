@@ -135,7 +135,7 @@ You can print comma separated tags following way:
 ~~~
 [php]
 $post->addTags('new1, new2')->save();
-echo $post->tags;
+echo $post->tags->toString();
 ~~~
 
 Using multiple tag groups
@@ -208,4 +208,41 @@ $soft = Software::model()->findByPk(1);
 $soft->addTag("Antivirus");
 $soft->os->addTag("Windows");
 $soft->save();
+~~~
+
+Using taggable with CAutoComplete
+---------------------------------
+
+~~~
+[php]
+<?$this->widget('CAutoComplete', array(
+	'name' => 'tags',
+	'value' => $model->tags->toString(),
+	'url'=>'/autocomplete/tags', //path to autocomplete URL
+	'multiple'=>true,
+	'mustMatch'=>false,
+	'matchCase'=>false,
+)) ?>
+~~~
+
+Saving tags will look like following:
+~~~
+[php]
+function actionUpdate(){
+	$model = Post::model()->findByPk($_GET['id']);
+
+	if(isset($_POST['Post'])){
+		$model->attributes=$_POST['Post'];
+		$model->setTags($_POST['tags']);
+
+		// if you have multiple tag fields:
+		// $model->tags1->setTags($_POST['tags1']);
+		// $model->tags1->setTags($_POST['tags2']);
+		
+		if($model->save()) $this->redirect(array('index'));
+	}
+	$this->render('update',array(
+		'model'=>$model,
+	));
+}
 ~~~

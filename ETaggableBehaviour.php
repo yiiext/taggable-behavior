@@ -4,7 +4,7 @@
  *
  * Provides tagging ability for a model.
  *
- * @version 1.0.2
+ * @version 1.1.0
  * @author Alexander Makarov
  * @link http://code.google.com/p/yiiext/
  */
@@ -26,6 +26,16 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
     public $tagBindingTableTagId = 'tagId';
 
     /**
+     * Tag table field.
+     */
+    public $tagTableName = 'name';
+
+    /**
+     * Tag table count field. If null don't uses database
+     */
+    public $tagTableCount = null;
+
+    /**
      * Binding table model FK name.
      * Defaults to `{model table name with first lowercased letter}Id`.  
      */
@@ -43,6 +53,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
 
     private $tags = array();
     private $originalTags = array();
+    private $_conn = null;
 
     /**
      * @var CCache
@@ -53,7 +64,9 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      * @return CDbConnection
      */
     protected function getConnection(){
-        return $this->getOwner()->dbConnection;
+        if (!isset($this->_conn))
+          $this->_conn = $this->getOwner()->dbConnection;
+        return $this->_conn;
     }
 
     /**
@@ -252,8 +265,9 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
                         sprintf(
                             "SELECT id
                              FROM `%s`
-                             WHERE name = %s",
+                             WHERE %s = %s",
                              $this->tagTable,
+                             $this->tagTableName,
                              $conn->quoteValue($tag)
                         )
                     )->queryScalar();
@@ -266,16 +280,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
 
             if(!$this->getOwner()->getIsNewRecord()){
                 // delete all present tag bindings if record is existing one
-                $conn->createCommand(
-                    sprintf(
-                        "DELETE
-                         FROM `%s`
-                         WHERE %s = %d",
-                         $this->getTagBindingTableName(),
-                         $this->getModelTableFkName(),
-                         $this->getOwner()->primaryKey
-                    )
-                )->execute();
+                $this->deleteTags();
             }
 
             // add new tag bindings and tags if there are any
@@ -287,23 +292,16 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
                         sprintf(
                             "SELECT id
                              FROM `%s`
-                             WHERE name = %s",
+                             WHERE %s = %s",
                              $this->tagTable,
+                             $this->tagTableName,
                              $conn->quoteValue($tag)
                         )
                     )->queryScalar();
 
                     // if there is no existing tag, create one
                     if(!$tagId){
-                        $conn->createCommand(
-                            sprintf(
-                                "INSERT
-                                 INTO `%s`(name)
-                                 VALUES (%s)",
-                                 $this->tagTable,
-                                 $conn->quoteValue($tag)
-                            )
-                        )->execute();
+                        $this->createTag($tag);
 
                         // reset all tags cache
                         $this->resetAllTagsCache();
@@ -326,6 +324,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
                         )
                     )->execute();
                 }
+                $this->updateCount(+1);
             }
 
 
@@ -358,17 +357,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      */
     function afterDelete($event){
         // delete all present tag bindings
-        $conn = $this->getConnection();
-        $conn->createCommand(
-            sprintf(
-                "DELETE
-                 FROM `%s`
-                 WHERE %s = %d",
-                 $this->getTagBindingTableName(),
-                 $this->getModelTableFkName(),
-                 $this->getOwner()->primaryKey
-            )
-        )->execute();
+        $this->deleteTags();
 
         $this->cache->delete($this->getCacheKey());
         $this->resetAllTagsWithModelsCountCache();
@@ -391,10 +380,11 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
             $conn = $this->getConnection();
             $tags = $conn->createCommand(
                 sprintf(
-                    "SELECT t.name as name
+                    "SELECT t.%s as name
                     FROM `%s` t
                     JOIN `%s` et ON t.id = et.%s
                     WHERE et.%s = %d",
+                    $this->tagTableName,
                     $this->tagTable,
                     $this->getTagBindingTableName(),
                     $this->tagBindingTableTagId,
@@ -421,7 +411,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
                 $this->tagTable.
                 $this->tagBindingTable.
                 $this->modelTableFk.
-                $this->tagBindingTableTagId.                
+                $this->tagBindingTableTagId.
                 $this->getOwner()->primaryKey;
     }
 
@@ -443,7 +433,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
                 $tag = $conn->quoteValue($tags[$i]);
                 $criteria->join.=
                     "JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
-                     JOIN {$this->tagTable} tag$i ON tag$i.id = bt$i.{$this->tagBindingTableTagId} AND tag$i.`name` = $tag";
+                     JOIN {$this->tagTable} tag$i ON tag$i.id = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
             }
         }
 
@@ -461,7 +451,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
             // getting associated tags
             $builder = $this->getOwner()->getCommandBuilder();
             $criteria = new CDbCriteria();
-            $criteria->select = 'name';
+            $criteria->select = $this->tagTableName;
             $tags = $builder->createFindCommand($this->tagTable, $criteria)->queryColumn();
 
             $this->cache->set('Taggable'.$this->getOwner()->tableName().'All', $tags);
@@ -480,17 +470,32 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
         if(!($tags = $this->cache->get('Taggable'.$this->getOwner()->tableName().'AllWithCount'))){
             // getting associated tags
             $conn = $this->getConnection();
-            $tags = $conn->createCommand(
-                sprintf(
-                    "SELECT t.name as name, count(*) as `count`
-                    FROM `%s` t
-                    JOIN `%s` et ON t.id = et.%s
-                    GROUP BY t.id",
+            if ($this->tagTableCount !== null)
+            {
+              $tags = $conn->createCommand(
+                  sprintf(
+                    "SELECT %s as name, %s as `count`
+                      FROM `%s`",
+                    $this->tagTableName,
+                    $this->tagTableCount,
+                    $this->tagTable
+                  )
+              )->queryAll();
+            }
+            else {
+              $tags = $conn->createCommand(
+                  sprintf(
+                    "SELECT t.%s as name, count(*) as `count`
+                      FROM `%s` t
+                      JOIN `%s` et ON t.id = et.%s
+                      GROUP BY t.id",
+                    $this->tagTableName,
                     $this->tagTable,
                     $this->getTagBindingTableName(),
                     $this->tagBindingTableTagId
-                )
-            )->queryAll();
+                  )
+              )->queryAll();
+            }
 
             $this->cache->set('Taggable'.$this->getOwner()->tableName().'AllWithCount', $tags);
         }
@@ -549,5 +554,76 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      */
     function withTags($tags){
         return $this->taggedWith($tags);
+    }
+
+    /**
+     * Delete all present tag bindings
+     * 
+     * @return void
+     */
+    protected function deleteTags() {
+        $this->updateCount(-1);
+
+        $conn = $this->getConnection();
+        $conn->createCommand(
+            sprintf(
+                "DELETE
+                 FROM `%s`
+                 WHERE %s = %d",
+                 $this->getTagBindingTableName(),
+                 $this->getModelTableFkName(),
+                 $this->getOwner()->primaryKey
+            )
+        )->execute();
+    }
+
+    /**
+     * Creates tag
+     * Is separate function for future inheritance
+     *
+     * @param  $tag
+     * @return void
+     */
+    protected function createTag($tag) {
+        $conn = $this->getConnection();
+        $conn->createCommand(
+            sprintf(
+                "INSERT
+                 INTO `%s`(%s)
+                 VALUES (%s)",
+                 $this->tagTable,
+                 $this->tagTableName,
+                 $conn->quoteValue($tag)
+            )
+        )->execute();
+    }
+
+    /**
+     * Updates counter information in database
+     * Used if tagTableCount is not null
+     *
+     * @param  $count incremental ("1") or decremental ("-1") value 
+     * @return void
+     */
+    protected function updateCount($count) {
+        if ($this->tagTableCount !== null)
+        {
+            $conn = $this->getConnection();
+            $conn->createCommand(
+                sprintf(
+                    "UPDATE %s
+                    SET %s = %s + %s
+                    WHERE id in (SELECT %s FROM %s WHERE %s = %d)",
+                    $this->tagTable,
+                    $this->tagTableCount,
+                    $this->tagTableCount,
+                    $count,
+                    $this->tagBindingTableTagId,
+                    $this->getTagBindingTableName(),
+                    $this->getModelTableFkName(),
+                    $this->getOwner()->primaryKey
+                )
+            )->execute();
+        }
     }
 }

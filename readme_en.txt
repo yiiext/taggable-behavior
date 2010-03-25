@@ -23,6 +23,11 @@ function behaviors() {
             // Foreign key in cross-table.
             // By default it's your_model_tableId
             'modelTableFk' => 'postId',
+            // Tag name field
+            'tagTableName' => 'name',
+            // Tag counter field
+            // if null (default) din't uses database
+            'tagTableCount' => 'count',
             // Tag binding table tag ID
             'tagBindingTableTagId' => 'tagId',
             // Caching component ID.
@@ -36,6 +41,42 @@ function behaviors() {
     );
 }
 ~~~
+
+For using AR model for tags (for example, for binding custom behavior), use EARTaggableBehaviour
+
+Add in settings import section taggable extension directory connection string
+
+return array(
+  // ...
+  'import'=>array(
+		'application.models.*',
+		'application.components.*',
+		'ext.yiiext.behaviors.model.taggable.*',
+		// ...
+		// other import
+	),
+	// ...
+);
+
+~~~
+
+In your ActiveRecord model define `behaviors()` method:
+
+[php]
+function behaviors() {
+    return array(
+        'tags_with_model' => array(
+            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehaviour',
+            // Имя таблицы для хранения тегов
+            'tagTable' => 'Tag',
+            // Имя модели тега
+            'tagModel' => 'Tag',
+            // ...
+            // other nedded params same as above
+        )
+    );
+}
+
 
 Methods
 -------

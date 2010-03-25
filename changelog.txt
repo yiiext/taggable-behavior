@@ -1,4 +1,12 @@
-next
+1.1
+[*] DBConnection now saves in private variable for perfomance issues
+[+] tagTableName option for customizing name field http://code.google.com/p/yiiext/issues/detail?id=12
+[+] tagTableCount param for counter field for storing count in database and 
+    http://code.google.com/p/yiiext/issues/detail?id=17
+[+] New subclass EARTaggableBehaviour for using behavior with Tags model
+    http://code.google.com/p/yiiext/issues/detail?id=13
+
+1.0.2
 [+] New manual section: using taggable with CAutoComplete.
 [*] Renamed __toString to toString since magic was hard to debug in case of failure.
 [*] Fixed more possible cache keys overlap when using multiple tag sets within one model.

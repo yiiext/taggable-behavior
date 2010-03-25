@@ -23,11 +23,17 @@ function behaviors() {
             // Имя внешнего ключа модели в кроcc-таблице.
             // По умолчанию равно имя_таблицы_моделиId 
             'modelTableFk' => 'postId',
+            // Имя поля названия тега 
+            'tagTableName' => 'name',
+            // Имя поля счетчика тега
+            // Если устанвовлено в null (по умолчанию), то не сохраняется в базе
+            'tagTableCount' => 'count',
             // ID тега в таблице-связке
             'tagBindingTableTagId' => 'tagId',
             // ID компонента, реализующего кеширование.
             // По умолчанию ID равен false. 
             'cacheID' => 'cache',
+
 
             // Создавать несуществующие теги автоматически.
             // При значении false сохранение выкидывает исключение если добавляемый тег не существует.
@@ -36,6 +42,42 @@ function behaviors() {
     );
 }
 ~~~
+
+Если надо использовать теги через модель (например, для назначения им своего поведения),
+используйте класс EARTaggableBehaviour
+
+Добавить в секцию import настроек строку подключения директории расшриения taggable
+
+return array(
+  // ...
+  'import'=>array(
+		'application.models.*',
+		'application.components.*',
+		'ext.yiiext.behaviors.model.taggable.*',
+		// ...
+		// другие импорты
+	),
+	// ...
+);
+
+~~~
+
+Определить в модели ActiveRecord метод `behaviors()`:
+
+[php]
+function behaviors() {
+    return array(
+        'tags_with_model' => array(
+            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehaviour',
+            // Имя таблицы для хранения тегов
+            'tagTable' => 'Tag',
+            // Имя модели тега
+            'tagModel' => 'Tag',
+            // ...
+            // остальные нужные параметры указываются также, как и выше
+        )
+    );
+}
 
 Методы
 ------

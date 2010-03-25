@@ -400,20 +400,29 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
     }
 
     /**
-     * Returns key for caching model tags
-     *
-     * @access private
+     * Returns key for caching specific model tags.
+     *     
      * @return string
      */
     private function getCacheKey(){
-        return 'Taggable'.
+        return $this->getCacheKeyBase().$this->getOwner()->primaryKey;
+    }
+
+	/**
+	 * Returns cache key base.
+	 *
+	 * @return string
+	 */
+	private function getCacheKeyBase(){
+		return 'Taggable'.
                 $this->getOwner()->tableName().
                 $this->tagTable.
                 $this->tagBindingTable.
+				$this->tagTableName.
                 $this->modelTableFk.
                 $this->tagBindingTableTagId.
                 $this->getOwner()->primaryKey;
-    }
+	}
 
     /**
      * Get criteria to limit query by tags
@@ -454,7 +463,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
             $criteria->select = $this->tagTableName;
             $tags = $builder->createFindCommand($this->tagTable, $criteria)->queryColumn();
 
-            $this->cache->set('Taggable'.$this->getOwner()->tableName().'All', $tags);
+            $this->cache->set('Taggable'.$this->getOwner()->tableName().'All', $tags);			
         }
 
         return $tags;

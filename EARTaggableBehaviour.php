@@ -1,16 +1,25 @@
 <?php
 /**
- * Author: 5е-1
- * Date: 09.03.2010
- * Time: 12:08:54
+ * TaggableBehaviour
+ *
+ * Allows to use AR objects as tags.
+ *
+ * @version 1.1.0
+ * @author 5е-1
+ * @link http://code.google.com/p/yiiext/
  */
-
 class EARTaggableBehaviour extends ETaggableBehaviour {
     /**
-     * Tags model name
+     * Tag model name
      */
     public $tagModel = 'Tag';
 
+	/**
+	 * Creates tag model
+	 *
+	 * @param string $title tag title
+	 * @return CActiveRecord
+	 */
     protected function createTag($title) {
         $class = $this->tagModel;
         $tag = new $class();

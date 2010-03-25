@@ -470,8 +470,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
         if(!($tags = $this->cache->get('Taggable'.$this->getOwner()->tableName().'AllWithCount'))){
             // getting associated tags
             $conn = $this->getConnection();
-            if ($this->tagTableCount !== null)
-            {
+            if($this->tagTableCount !== null){
               $tags = $conn->createCommand(
                   sprintf(
                     "SELECT %s as name, %s as `count`
@@ -578,10 +577,10 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
     }
 
     /**
-     * Creates tag
-     * Is separate function for future inheritance
+     * Creates a tag
+     * Method is for future inheritance
      *
-     * @param  $tag
+     * @param string $tag tag name
      * @return void
      */
     protected function createTag($tag) {
@@ -602,12 +601,11 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      * Updates counter information in database
      * Used if tagTableCount is not null
      *
-     * @param  $count incremental ("1") or decremental ("-1") value 
+     * @param int $count incremental ("1") or decremental ("-1") value
      * @return void
      */
     protected function updateCount($count) {
-        if ($this->tagTableCount !== null)
-        {
+        if ($this->tagTableCount !== null){
             $conn = $this->getConnection();
             $conn->createCommand(
                 sprintf(

@@ -26,7 +26,7 @@ function behaviors() {
             // Tag name field
             'tagTableName' => 'name',
             // Tag counter field
-            // if null (default) din't uses database
+            // if null (default) does not write tag counts to DB
             'tagTableCount' => 'count',
             // Tag binding table tag ID
             'tagBindingTableTagId' => 'tagId',
@@ -42,9 +42,9 @@ function behaviors() {
 }
 ~~~
 
-For using AR model for tags (for example, for binding custom behavior), use EARTaggableBehaviour
+For using AR model for tags (for example, to bind custom behavior), use EARTaggableBehaviour.
 
-Add in settings import section taggable extension directory connection string
+To do it add following to your config:
 
 return array(
   // ...
@@ -53,29 +53,30 @@ return array(
 		'application.components.*',
 		'ext.yiiext.behaviors.model.taggable.*',
 		// ...
-		// other import
+		// other imports
 	),
 	// ...
 );
-
 ~~~
 
-In your ActiveRecord model define `behaviors()` method:
+In your AR model implement `behaviors()` method:
 
+~~~
 [php]
 function behaviors() {
     return array(
         'tags_with_model' => array(
             'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehaviour',
-            // Имя таблицы для хранения тегов
+            // tag table name
             'tagTable' => 'Tag',
-            // Имя модели тега
+            // tag model class
             'tagModel' => 'Tag',
             // ...
-            // other nedded params same as above
+            // other options as shown above
         )
     );
 }
+~~~
 
 
 Methods

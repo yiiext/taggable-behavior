@@ -64,6 +64,7 @@ return array(
 
 Определить в модели ActiveRecord метод `behaviors()`:
 
+~~~
 [php]
 function behaviors() {
     return array(
@@ -78,6 +79,7 @@ function behaviors() {
         )
     );
 }
+~~~
 
 Методы
 ------

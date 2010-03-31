@@ -208,6 +208,59 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
         return $this->tags;
     }
 
+	/**
+	 * Get current model's tags with counts
+	 *
+	 * @todo: quick implementation, rewrite!
+	 *
+	 * @param CDbCriteria $criteria
+	 * @return array
+	 */
+	function getTagsWithModelsCount($criteria = null){
+        if(!($tags = $this->cache->get($this->getCacheKey().'WithModelsCount'))){
+            // getting associated tags
+            $conn = $this->getConnection();
+            if($this->tagTableCount !== null){
+              $tags = $conn->createCommand(
+                  sprintf(
+                    "SELECT %s as name, %s as `count`
+                      FROM `%s` t
+                      JOIN `%s` et ON t.id = et.%s
+					  WHERE et.%s = %d",
+                    $this->tagTableName,
+                    $this->tagTableCount,
+                    $this->tagTable,
+					$this->getTagBindingTableName(),
+                    $this->tagBindingTableTagId,
+                    $this->getModelTableFkName(),
+                    $this->getOwner()->primaryKey
+                  )
+              )->queryAll();
+            }
+            else {
+              $tags = $conn->createCommand(
+                  sprintf(
+                    "SELECT t.%s as name, count(*) as `count`
+                      FROM `%s` t
+                      JOIN `%s` et ON t.id = et.%s
+                      WHERE et.%s = %d
+                      GROUP BY t.id",
+                    $this->tagTableName,
+                    $this->tagTable,
+                    $this->getTagBindingTableName(),
+                    $this->tagBindingTableTagId,
+					$this->getModelTableFkName(),
+                    $this->getOwner()->primaryKey
+                  )
+              )->queryAll();
+            }
+
+            $this->cache->set($this->getCacheKey().'WithModelsCount', $tags);
+        }
+
+        return $tags;
+	}
+
     /**
      * Get tags array from comma separated tags string 
      *
@@ -415,13 +468,12 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
 	 */
 	private function getCacheKeyBase(){
 		return 'Taggable'.
-                $this->getOwner()->tableName().
-                $this->tagTable.
-                $this->tagBindingTable.
-				$this->tagTableName.
-                $this->modelTableFk.
-                $this->tagBindingTableTagId.
-                $this->getOwner()->primaryKey;
+			$this->getOwner()->tableName().
+			$this->tagTable.
+			$this->tagBindingTable.
+			$this->tagTableName.
+			$this->modelTableFk.
+			$this->tagBindingTableTagId;
 	}
 
     /**
@@ -438,8 +490,9 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
 
         if(!empty($tags)){
             $conn = $this->getConnection();
+			$criteria->select = 't.*';
             for($i=0, $count=count($tags); $i<$count; $i++){
-                $tag = $conn->quoteValue($tags[$i]);
+                $tag = $conn->quoteValue($tags[$i]);				
                 $criteria->join.=
                     "JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
                      JOIN {$this->tagTable} tag$i ON tag$i.id = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
@@ -506,7 +559,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
             }
 
             $this->cache->set('Taggable'.$this->getOwner()->tableName().'AllWithCount', $tags);
-        }
+        }		
 
         return $tags;
     }

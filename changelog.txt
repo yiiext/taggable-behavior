@@ -1,3 +1,8 @@
+1.2
+[*] Fixed getting wrong ids when using withTags() or taggedWith().
+[+] ETagListWidget.
+[+] Added getTagsWithModelsCount().
+
 1.1
 [*] DBConnection is now saved in a private variable for better perfomance.
 [+] Added tagTableName property that allows customizing name field http://code.google.com/p/yiiext/issues/detail?id=12

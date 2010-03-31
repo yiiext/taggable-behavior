@@ -1,7 +1,9 @@
 1.2
+[*] Fixed getting tags array from string with separator at the end or beginning of line.
 [*] Fixed getting wrong ids when using withTags() or taggedWith().
 [+] ETagListWidget.
 [+] Added getTagsWithModelsCount().
+[+] getAllTagsWithModelsCount now can accept criteria.
 
 1.1
 [*] DBConnection is now saved in a private variable for better perfomance.

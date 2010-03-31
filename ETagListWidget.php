@@ -13,16 +13,17 @@ class ETagListWidget extends CMenu {
 	public $class = 'tags';
 
 	public $url = '';
-	public $urlParamName = 'tag';
+	public $urlParamName = 'tag';	
 
 	function init(){
 		if(!isset($this->htmlOptions['class'])) $this->htmlOptions['class'] = 'tags';
 
 		$tags = array();
 		if($this->all){
-			if($this->count){				
-				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount();
-				$this->model->{$this->field}->resetAllTagsWithModelsCountCache();
+			if($this->count){
+				$criteria = new CDbCriteria();
+				$criteria->order = $this->model->{$this->field}->tagTableName;
+				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount($criteria);
 			}
 			else {
 				$tags = $this->model->{$this->field}->getAllTags();
@@ -38,7 +39,7 @@ class ETagListWidget extends CMenu {
 		}
 
 		foreach($tags as $tag){
-			if(is_array($tag)){
+			if(is_array($tag)){				
 				$this->items[] = array(
 					'label' => $tag['name'].' <span>'.$tag['count'].'</span>',
 					'url' => array($this->url, $this->urlParamName => $tag['name']),					
@@ -50,7 +51,7 @@ class ETagListWidget extends CMenu {
 					'url' => array($this->url, $this->urlParamName => $tag),
 				);
 			}
-		}
+		}		
 
 		parent::init();		
 	}

@@ -269,7 +269,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      * @return array
      */
     protected function toTagsArray($tags){
-        if(is_string($tags)) $tags = explode(',', $tags);
+        if(is_string($tags)) $tags = explode(',', trim($tags, ' ,'));
         array_walk($tags, array($this, 'trim'));
         return $tags;
     }
@@ -531,32 +531,33 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
     public function getAllTagsWithModelsCount($criteria = null){
         if(!($tags = $this->cache->get('Taggable'.$this->getOwner()->tableName().'AllWithCount'))){
             // getting associated tags
-            $conn = $this->getConnection();
+			$builder = $this->getOwner()->getCommandBuilder();
+
+            $tagsCriteria = new CDbCriteria();
+            
             if($this->tagTableCount !== null){
-              $tags = $conn->createCommand(
-                  sprintf(
-                    "SELECT %s as name, %s as `count`
-                      FROM `%s`",
-                    $this->tagTableName,
-                    $this->tagTableCount,
-                    $this->tagTable
-                  )
-              )->queryAll();
+				$tagsCriteria->select = sprintf(
+					"%s as `name`, %s as `count`",
+					$this->tagTableName,
+					$this->tagTableCount
+				);              
             }
             else {
-              $tags = $conn->createCommand(
-                  sprintf(
-                    "SELECT t.%s as name, count(*) as `count`
-                      FROM `%s` t
-                      JOIN `%s` et ON t.id = et.%s
-                      GROUP BY t.id",
-                    $this->tagTableName,
-                    $this->tagTable,
-                    $this->getTagBindingTableName(),
-                    $this->tagBindingTableTagId
-                  )
-              )->queryAll();
+			  $tagsCriteria->select = sprintf(
+				  "%s as `name`, count(*) as `count`",
+				  $this->tagTableName
+			  );
+			  $tagsCriteria->join = sprintf(
+				  "JOIN `%s` et ON t.id = et.%s",
+				  $this->getTagBindingTableName(),
+				  $this->tagBindingTableTagId
+			  );
+			  $tagsCriteria->group = 't.id';
             }
+
+			if($criteria!==null) $tagsCriteria->mergeWith($criteria);
+
+			$tags = $builder->createFindCommand($this->tagTable, $tagsCriteria)->queryAll();			
 
             $this->cache->set('Taggable'.$this->getOwner()->tableName().'AllWithCount', $tags);
         }		

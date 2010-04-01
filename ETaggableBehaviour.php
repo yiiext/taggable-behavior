@@ -269,7 +269,7 @@ class ETaggableBehaviour extends CActiveRecordBehavior {
      * @return array
      */
     protected function toTagsArray($tags){
-        if(is_string($tags)) $tags = explode(',', trim($tags, ' ,'));
+        if(is_string($tags)) $tags = explode(',', trim(strip_tags($tags), ' ,'));
         array_walk($tags, array($this, 'trim'));
         return $tags;
     }

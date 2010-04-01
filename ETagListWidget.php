@@ -25,7 +25,7 @@ class ETagListWidget extends CMenu {
 				$criteria->order = $this->model->{$this->field}->tagTableName;
 				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount($criteria);
 			}
-			else {
+			else {				
 				$tags = $this->model->{$this->field}->getAllTags();
 			}
 		}
@@ -41,14 +41,15 @@ class ETagListWidget extends CMenu {
 		foreach($tags as $tag){
 			if(is_array($tag)){				
 				$this->items[] = array(
-					'label' => $tag['name'].' <span>'.$tag['count'].'</span>',
-					'url' => array($this->url, $this->urlParamName => $tag['name']),					
+					'label' => CHtml::encode($tag['name']).' <span>'.$tag['count'].'</span>',
+					'url' => array($this->url, $this->urlParamName => $tag['name']),
 				);
 			}
-			else {
+			else {				
 				$this->items[] = array(
-					'label' => $tag,
+					'label' => CHtml::encode($tag),
 					'url' => array($this->url, $this->urlParamName => $tag),
+
 				);
 			}
 		}		

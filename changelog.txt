@@ -4,6 +4,7 @@
 [+] ETagListWidget.
 [+] Added getTagsWithModelsCount().
 [+] getAllTagsWithModelsCount now can accept criteria.
+[*] Input is being passed through strip_tags now. 
 
 1.1
 [*] DBConnection is now saved in a private variable for better perfomance.

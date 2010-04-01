@@ -23,6 +23,7 @@ class ETagListWidget extends CMenu {
 			if($this->count){
 				$criteria = new CDbCriteria();
 				$criteria->order = $this->model->{$this->field}->tagTableName;
+				$criteria->compare('count', '>0');
 				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount($criteria);
 			}
 			else {				
@@ -31,6 +32,7 @@ class ETagListWidget extends CMenu {
 		}
 		else {
 			if($this->count){
+				$criteria->compare('count', '>0');
 				$tags = $this->model->{$this->field}->getTagsWithModelsCount();
 			}
 			else {

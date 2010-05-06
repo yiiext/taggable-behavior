@@ -1,5 +1,5 @@
-Taggable Behaviour
-==================
+Taggable Behavior
+=================
 
 Allows active record model to manage tags.
 
@@ -14,7 +14,7 @@ In your ActiveRecord model define `behaviors()` method:
 function behaviors() {
     return array(
         'tags' => array(
-            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
             // Table where tags are stored
             'tagTable' => 'Tag',
             // Cross-table that stores tag-model connections.
@@ -237,13 +237,13 @@ Then we are attaching behaviours:
 [php]
 return array(
     'categories' => array(
-        'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+        'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
         'tagTable' => 'Category',
         'tagBindingTable' => 'PostCategory',
         'tagBindingTableTagId' => 'categoryId',
     ),
     'os' => array(
-        'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+        'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
         'tagTable' => 'Os',
         'tagBindingTable' => 'PostOs',
         'tagBindingTableTagId' => 'osId',

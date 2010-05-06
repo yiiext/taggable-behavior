@@ -1,5 +1,5 @@
-Taggable Behaviour
-==================
+Taggable Behavior
+=================
 
 Позволяет модели работать с тегами.
 
@@ -14,7 +14,7 @@ Taggable Behaviour
 function behaviors() {
     return array(
         'tags' => array(
-            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
             // Имя таблицы для хранения тегов 
             'tagTable' => 'Tag',
             // Имя кросс-таблицы, связывающей тег с моделью.
@@ -55,7 +55,7 @@ function behaviors() {
 ~~~
 
 Если надо использовать теги через модель (например, для назначения им своего поведения),
-используйте класс EARTaggableBehaviour
+используйте класс EARTaggableBehavior
 
 Добавить в секцию import настроек строку подключения директории расшриения taggable
 
@@ -80,7 +80,7 @@ return array(
 function behaviors() {
     return array(
         'tags_with_model' => array(
-            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehavior',
             // Имя таблицы для хранения тегов
             'tagTable' => 'Tag',
             // Имя модели тега
@@ -241,13 +241,13 @@ CREATE TABLE `PostCategory` (
 [php]
 return array(
     'categories' => array(
-        'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+        'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
         'tagTable' => 'Category',
         'tagBindingTable' => 'PostCategory',
         'tagBindingTableTagId' => 'categoryId',
     ),
     'os' => array(
-        'class' => 'ext.CTaggableBehaviour.CTaggableBehaviour',
+        'class' => 'ext.yiiext.behaviors.model.taggable.ETaggableBehavior',
         'tagTable' => 'Os',
         'tagBindingTable' => 'PostOs',
         'tagBindingTableTagId' => 'osId',

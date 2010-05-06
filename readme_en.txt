@@ -37,6 +37,17 @@ function behaviors() {
             // Save nonexisting tags.
             // When false, throws exception when saving nonexisting tag.
             'createTagsAutomatically' => true,
+
+            // Default tag selection criteria
+            'scope' => array(
+				'condition' => ' t.user_id = :user_id ',
+				'params' => array( ':user_id' => Yii::app()->user->id ),
+			),
+
+			// Values to insert to tag table on adding tag
+			'insertValues' => array(
+				'user_id' => Yii::app()->user->id,
+			),
         )
     );
 }

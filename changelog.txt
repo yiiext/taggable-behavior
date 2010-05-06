@@ -4,6 +4,7 @@
 [+] Better criteria support (mitallast).
 [*] Files and classnames are renamed to ETaggableBehavior and EARTaggableBehavior.
 [+] Added criteria support to ETagListWidget.
+[+] More flexibility for ETagListWidget url.
 
 1.2
 [*] Fixed getting tags array from string with separator at the end or beginning of line.

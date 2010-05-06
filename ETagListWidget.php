@@ -35,7 +35,13 @@ class ETagListWidget extends CMenu {
 	 */
 	public $class = 'tags';
 
+	/**
+	 * URL to use for tag links.
+	 * @see CHtml::normalizeUrl.
+	 */
 	public $url = '';
+
+	/* URL tag parameter name */
 	public $urlParamName = 'tag';
 
 	/**
@@ -81,17 +87,20 @@ class ETagListWidget extends CMenu {
 		}
 
 		foreach($tags as $tag){
-			if(is_array($tag)){				
+			$url = (array)$this->url;
+			
+			if(is_array($tag)){
+				$url[$this->urlParamName] = $tag['name'];
 				$this->items[] = array(
 					'label' => CHtml::encode($tag['name']).' <span>'.$tag['count'].'</span>',
-					'url' => array($this->url, $this->urlParamName => $tag['name']),
+					'url' => $url,
 				);
 			}
-			else {				
+			else {
+				$url[$this->urlParamName] = $tag;
 				$this->items[] = array(
 					'label' => CHtml::encode($tag),
-					'url' => array($this->url, $this->urlParamName => $tag),
-
+					'url' => $url,
 				);
 			}
 		}		

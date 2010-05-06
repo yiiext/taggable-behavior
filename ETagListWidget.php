@@ -4,51 +4,79 @@ Yii::import('zii.widgets.CMenu');
  * ETagListWidget
  */
 class ETagListWidget extends CMenu {
+	/**
+	 * Model with ETaggableBehavior attached
+	 */
 	public $model;
+
+	/**
+	 * Behavior name
+	 */
 	public $field = 'tags';
 
+	/**
+	 * Show all tags
+	 */
 	public $all = false;
+
+	/**
+	 * Show counter for each tag
+	 */
 	public $count = false;
 
+	/**
+	 * Do not show tags with count below this value.
+	 * Currently works only when count is shown.
+	 */
+	public $countLimit = 1;
+
+	/**
+	 * CSS class
+	 */
 	public $class = 'tags';
 
 	public $url = '';
 	public $urlParamName = 'tag';
 
+	/**
+	 * Criteria used to select tags
+	 */
 	public $criteria = null;
 
 	function init(){
 		if(!isset($this->htmlOptions['class'])) $this->htmlOptions['class'] = 'tags';
 
 		$tags = array();
+
+		$criteria = new CDbCriteria();
+		$criteria->order = $this->model->{$this->field}->tagTableName;
 		
 		if($this->all){
 			if($this->count){
-				$criteria = new CDbCriteria();
-				$criteria->order = $this->model->{$this->field}->tagTableName;
-				$criteria->compare('count', '>0');
-				if($this->criteria) $criteria->mergeWith($this->criteria);
+				$criteria->having = 'count>='.(int)$this->countLimit;
+				if($this->criteria)
+					$criteria->mergeWith($this->criteria);
 				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount($criteria);
 			}
 			else {
 				if($this->criteria)
-					$tags = $this->model->{$this->field}->getAllTags($this->criteria);
-				else
-					$tags = $this->model->{$this->field}->getAllTags();
+					$criteria->mergeWith($this->criteria);
+
+				$tags = $this->model->{$this->field}->getAllTags($criteria);
 			}
 		}
 		else {
 			if($this->count){
-				$criteria = new CDbCriteria();
-				$criteria->compare('count', '>0');
-				if($this->criteria) $criteria->mergeWith($this->criteria);				
-				$tags = $this->model->{$this->field}->getTagsWithModelsCount();
+				$criteria->having = 'count>='.(int)$this->countLimit;
+				if($this->criteria)
+					$criteria->mergeWith($this->criteria);				
+				$tags = $this->model->{$this->field}->getTagsWithModelsCount($criteria);
 			}
 			else {
 				if($this->criteria)
-					$tags = $this->model->{$this->field}->getTags($this->criteria);
-				else
-					$tags = $this->model->{$this->field}->getTags();
+					$criteria->mergeWith($this->criteria);
+
+				$tags = $this->model->{$this->field}->getTags($criteria);
 			}			
 		}
 

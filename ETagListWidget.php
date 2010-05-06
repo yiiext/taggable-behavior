@@ -13,30 +13,42 @@ class ETagListWidget extends CMenu {
 	public $class = 'tags';
 
 	public $url = '';
-	public $urlParamName = 'tag';	
+	public $urlParamName = 'tag';
+
+	public $criteria = null;
 
 	function init(){
 		if(!isset($this->htmlOptions['class'])) $this->htmlOptions['class'] = 'tags';
 
 		$tags = array();
+		
 		if($this->all){
 			if($this->count){
 				$criteria = new CDbCriteria();
 				$criteria->order = $this->model->{$this->field}->tagTableName;
 				$criteria->compare('count', '>0');
+				if($this->criteria) $criteria->mergeWith($this->criteria);
 				$tags = $this->model->{$this->field}->getAllTagsWithModelsCount($criteria);
 			}
-			else {				
-				$tags = $this->model->{$this->field}->getAllTags();
+			else {
+				if($this->criteria)
+					$tags = $this->model->{$this->field}->getAllTags($this->criteria);
+				else
+					$tags = $this->model->{$this->field}->getAllTags();
 			}
 		}
 		else {
 			if($this->count){
+				$criteria = new CDbCriteria();
 				$criteria->compare('count', '>0');
+				if($this->criteria) $criteria->mergeWith($this->criteria);				
 				$tags = $this->model->{$this->field}->getTagsWithModelsCount();
 			}
 			else {
-				$tags = $this->model->{$this->field}->getTags();
+				if($this->criteria)
+					$tags = $this->model->{$this->field}->getTags($this->criteria);
+				else
+					$tags = $this->model->{$this->field}->getTags();
 			}			
 		}
 

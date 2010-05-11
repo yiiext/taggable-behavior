@@ -1,5 +1,5 @@
 1.3
-[*] Tag table primary key is no longer hardcoded as `id`.
+[*] Tag table primary key is no longer hardcoded as `id` and can be set via `tagTablePk`.
 [+] Additional values inserting support (mitallast).
 [+] Default scope criteria support (mitallast).
 [+] Better criteria support (mitallast).

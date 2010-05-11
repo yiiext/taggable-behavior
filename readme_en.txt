@@ -23,6 +23,8 @@ function behaviors() {
             // Foreign key in cross-table.
             // By default it's your_model_tableId
             'modelTableFk' => 'postId',
+            // Tag table PK field
+            'tagTablePk' => 'id',
             // Tag name field
             'tagTableName' => 'name',
             // Tag counter field

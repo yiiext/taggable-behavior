@@ -1,4 +1,5 @@
 1.3
+[*] Tag table primary key is no longer hardcoded as `id`.
 [+] Additional values inserting support (mitallast).
 [+] Default scope criteria support (mitallast).
 [+] Better criteria support (mitallast).

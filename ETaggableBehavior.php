@@ -268,7 +268,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			if($this->tagTableCount !== null){
 				$findCriteria = new CDbCriteria(array(
 					'select' => "t.{$this->tagTableName} as `name`, t.{$this->tagTableCount} as `count` ",
-					'join' => "INNER JOIN {$this->getTagBindingTableName()} et on t.id = et.{$this->tagBindingTableTagId} ",
+					'join' => "INNER JOIN {$this->getTagBindingTableName()} et on t.{$this->getTagTablePk()} = et.{$this->tagBindingTableTagId} ",
 					'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 					'params' => array(
 						':ownerid' => $this->getOwner()->primaryKey,
@@ -277,9 +277,9 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			} else{
 				$findCriteria = new CDbCriteria(array(
 					'select' => "t.{$this->tagTableName} as `name`, count(*) as `count` ",
-					'join' => "INNER JOIN {$this->getTagBindingTableName()} et on t.id = et.{$this->tagBindingTableTagId} ",
+					'join' => "INNER JOIN {$this->getTagBindingTableName()} et on t.{$this->getTagTablePk()} = et.{$this->tagBindingTableTagId} ",
 					'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
-					'group' => 't.id',
+					'group' => 't.'.$this->getTagTablePk(),
 					'params' => array(
 						':ownerid' => $this->getOwner()->primaryKey,
 					)
@@ -360,7 +360,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				foreach($this->tags as $tag){
 
 					$findCriteria = new CDbCriteria(array(
-						'select' => "t.id",
+						'select' => "t.".$this->getTagTablePk(),
 						'condition' => "t.{$this->tagTableName} = :tag ",
 						'params' => array(':tag' => $tag),
 					));
@@ -391,7 +391,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 					// try to get existing tag
 					$findCriteria = new CDbCriteria(array(
-						'select' => "t.id",
+						'select' => "t.".$this->getTagTablePk(),
 						'condition' => "t.{$this->tagTableName} = :tag ",
 						'params' => array(':tag' => $tag),
 					));
@@ -479,7 +479,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 			$findCriteria = new CDbCriteria(array(
 				'select' => "t.{$this->tagTableName} as `name`",
-				'join' => "INNER JOIN {$this->getTagBindingTableName()} et ON t.id = et.{$this->tagBindingTableTagId} ",
+				'join' => "INNER JOIN {$this->getTagBindingTableName()} et ON t.{$this->getTagTablePk()} = et.{$this->tagBindingTableTagId} ",
 				'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 				'params' => array(
 					':ownerid' => $this->getOwner()->primaryKey,
@@ -546,7 +546,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				$tag = $conn->quoteValue($tags[$i]);
 				$criteria->join .=
 						"JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
-                     JOIN {$this->tagTable} tag$i ON tag$i.id = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
+                     JOIN {$this->tagTable} tag$i ON tag$i.{$this->getTagTablePk()} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
 			}
 		}
 
@@ -609,11 +609,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					$this->tagTableName
 				);
 				$tagsCriteria->join = sprintf(
-					"JOIN `%s` et ON t.id = et.%s",
+					"JOIN `%s` et ON t.{$this->getTagTablePk()} = et.%s",
 					$this->getTagBindingTableName(),
 					$this->tagBindingTableTagId
 				);
-				$tagsCriteria->group = 't.id';
+				$tagsCriteria->group = 't.'.$this->getTagTablePk();
 			}
 
 			if($criteria!==null)
@@ -711,7 +711,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			'params' => array(
 				':owner_id' => $this->getOwner()->primaryKey
 			),
-			'join' => "LEFT JOIN {$this->tagTable} t ON t.id = d.{$this->tagBindingTableTagId}",
+			'join' => "LEFT JOIN {$this->tagTable} t ON t.{$this->getTagTablePk()} = d.{$this->tagBindingTableTagId}",
 		));
 
 		if ($this->getScopeCriteria()) {
@@ -794,5 +794,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				)
 			)->execute();
 		}
+	}
+
+	protected function getTagTablePk(){
+		$key = $this->getOwner()->getMetaData()->tableSchema->primaryKey;
+		if($key===null) throw new CException("Primary key is not defined.");
+		if(is_array($key)) throw new CException("Composite primary key is not supported.");
+		return $key;
 	}
 }

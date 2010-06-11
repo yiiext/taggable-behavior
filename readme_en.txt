@@ -9,6 +9,7 @@ Create a table where you want to store tags and cross-table to store tag-model c
 You can use sample SQL from `schema.sql` file.
 
 In your ActiveRecord model define `behaviors()` method:
+
 ~~~
 [php]
 function behaviors() {
@@ -35,7 +36,7 @@ function behaviors() {
             // Caching component ID.
             // false by default.
             'cacheID' => 'cache',
-            
+
             // Save nonexisting tags.
             // When false, throws exception when saving nonexisting tag.
             'createTagsAutomatically' => true,
@@ -59,6 +60,8 @@ For using AR model for tags (for example, to bind custom behavior), use EARTagga
 
 To do it add following to your config:
 
+~~~
+[php]
 return array(
   // ...
   'import'=>array(
@@ -164,6 +167,7 @@ foreach($tags as $tag){
 
 ### getAllTagsWithModelsCount()
 Get all possible tags with models count for each for this model class.
+
 ~~~
 [php]
 $tags = Post::model()->getAllTagsWithModelsCount();
@@ -187,6 +191,7 @@ could be used to reset getAllTags() or getAllTagsWithModelsCount() cache.
 Bonus features
 --------------
 You can print comma separated tags following way:
+
 ~~~
 [php]
 $post->addTags('new1, new2')->save();
@@ -281,6 +286,7 @@ Using taggable with CAutoComplete
 ~~~
 
 Saving tags will look like following:
+
 ~~~
 [php]
 function actionUpdate(){
@@ -293,7 +299,7 @@ function actionUpdate(){
 		// if you have multiple tag fields:
 		// $model->tags1->setTags($_POST['tags1']);
 		// $model->tags1->setTags($_POST['tags2']);
-		
+
 		if($model->save()) $this->redirect(array('index'));
 	}
 	$this->render('update',array(

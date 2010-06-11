@@ -13,7 +13,7 @@
 [+] ETagListWidget.
 [+] Added getTagsWithModelsCount().
 [+] getAllTagsWithModelsCount now can accept criteria.
-[*] Input is being passed through strip_tags now. 
+[*] Input is being passed through strip_tags now.
 
 1.1
 [*] DBConnection is now saved in a private variable for better perfomance.
@@ -38,7 +38,7 @@ Warning: this version is not compatible with Yii 1.0.
 
 [+] Added resetAllTagsCache() and resetAllTagsWithModelsCountCache().
 [*] Fixed getAllTags() and getAllTagsWithModelsCount() cache issues.
-[*] Now tags are saved on save() only if they were changed. 
+[*] Now tags are saved on save() only if they were changed.
 [*] Extension is now compatible only with Yii 1.1.
 [*] Fixed saving empty tags.
 [*] Fixed caching.
@@ -49,9 +49,9 @@ Warning: this version is not backwards compatible to 0.6.
 [+] Now you can set tagId field name for binding table.
 [*] Do not try to delete tag bindings when inserting new record.
 [+] Added taggedWith() alias withTags().
-[-] Removed getCountByTags(), findAllByTags(). Use taggedWith(). 
+[-] Removed getCountByTags(), findAllByTags(). Use taggedWith().
 [+] Method chaining: $post->addTags("yii, php")->save();
-[+] New syntax: $posts = Post::model()->taggedWith(array('php', 'yii'))->findAll(); 
+[+] New syntax: $posts = Post::model()->taggedWith(array('php', 'yii'))->findAll();
 [*] Added parent:: calls in event handlers.
 [+] Added hasTags() and it's alias hasTag() to check if all tags specified are attached to current model.
 [+] New syntax: echo $post->tags (or by what name behaviour is attached) will print comma separated tags.
@@ -63,7 +63,7 @@ Warning: this version is not backwards compatible to 0.6.
 [*] Added $with to findAllByTags().
 [+] getAllTags().
 [+] Unit tests.
-[+] createTagsAutomatically option allows to throw exception when adding nonexisting tag. 
+[+] createTagsAutomatically option allows to throw exception when adding nonexisting tag.
 
 0.6
 [+] Initial public release.

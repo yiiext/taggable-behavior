@@ -56,7 +56,7 @@ function behaviors() {
 }
 ~~~
 
-For using AR model for tags (for example, to bind custom behavior), use EARTaggableBehaviour.
+For using AR model for tags (for example, to bind custom behavior), use EARTaggableBehavior.
 
 To do it add following to your config:
 
@@ -82,7 +82,7 @@ In your AR model implement `behaviors()` method:
 function behaviors() {
     return array(
         'tags_with_model' => array(
-            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehaviour',
+            'class' => 'ext.yiiext.behaviors.model.taggable.EARTaggableBehavior',
             // tag table name
             'tagTable' => 'Tag',
             // tag model class
@@ -238,7 +238,7 @@ CREATE TABLE `PostCategory` (
 );
 ~~~
 
-Then we are attaching behaviours:
+Then we are attaching behaviors:
 
 ~~~
 [php]
@@ -263,7 +263,7 @@ That's it. Now we can use it:
 ~~~
 [php]
 $soft = Software::model()->findByPk(1);
-// fist attached taggable behaviour is used by default
+// fist attached taggable behavior is used by default
 // so we can use short syntax instead of $soft->categories->addTag("Antivirus"):
 $soft->addTag("Antivirus");
 $soft->os->addTag("Windows");

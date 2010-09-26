@@ -527,7 +527,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				$this->tagTable.
 				$this->tagBindingTable.
 				$this->tagTableName.
-				$this->modelTableFk.
+				$this->getModelTableFkName().
 				$this->tagBindingTableTagId.
 				json_encode($this->scope);
 	}

@@ -8,9 +8,9 @@ CREATE TABLE `Tag` (
 
 /* Tag binding table */
 CREATE TABLE `PostTag` (
-  `postId` INT(10) UNSIGNED NOT NULL,
+  `post_id` INT(10) UNSIGNED NOT NULL,
   `tagId` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY  (`postId`,`tagId`)
+  PRIMARY KEY  (`post_id`,`tagId`)
 );
 
 /* Tag table */
@@ -23,7 +23,7 @@ CREATE TABLE `Color` (
 
 /* Tag binding table */
 CREATE TABLE `PostColor` (
-  `postId` INT(10) UNSIGNED NOT NULL,
+  `post_id` INT(10) UNSIGNED NOT NULL,
   `colorId` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY  (`postId`,`colorId`)
+  PRIMARY KEY  (`post_id`,`colorId`)
 );

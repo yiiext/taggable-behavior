@@ -22,7 +22,7 @@ function behaviors() {
             'tagBindingTable' => 'PostTag',
             // Имя внешнего ключа модели в кроcc-таблице.
             // По умолчанию равно имя_таблицы_моделиId
-            'modelTableFk' => 'postId',
+            'modelTableFk' => 'post_id',
             // Имя первичного ключа тега
             'tagTablePk' => 'id',
             // Имя поля названия тега
@@ -220,9 +220,9 @@ CREATE TABLE `Os` (
 
 /* Tag binding table */
 CREATE TABLE `PostOs` (
-  `postId` INT(10) UNSIGNED NOT NULL,
+  `post_id` INT(10) UNSIGNED NOT NULL,
   `osId` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY  (`postId`,`osId`)
+  PRIMARY KEY  (`post_id`,`osId`)
 );
 
 /* Tag table */
@@ -235,9 +235,9 @@ CREATE TABLE `Category` (
 
 /* Tag binding table */
 CREATE TABLE `PostCategory` (
-  `postId` INT(10) UNSIGNED NOT NULL,
+  `post_id` INT(10) UNSIGNED NOT NULL,
   `categoryId` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY  (`postId`,`categoryId`)
+  PRIMARY KEY  (`post_id`,`categoryId`)
 );
 ~~~
 

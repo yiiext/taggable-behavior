@@ -1,5 +1,7 @@
 next
 ----
+- Change CacheID defaults to false. If false don't use cache.
+- Fixed phpDoc
 - Fixed cache key generation (Sam Dark)
 - Fixed English docs (Sam Dark)
 

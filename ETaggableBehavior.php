@@ -1,92 +1,82 @@
 <?php
 /**
- * TaggableBehaviour
+ * ETaggableBehavior class file.
  *
- * Provides tagging ability for a model.
- *
- * @version 1.3
  * @author Alexander Makarov
  * @link http://code.google.com/p/yiiext/
  */
+/**
+ * Provides tagging ability for a model.
+ *
+ * @version 1.3
+ * @package yiiext.behaviors.model.taggable
+ */
 class ETaggableBehavior extends CActiveRecordBehavior {
 	/**
-	 * Tags table name
+	 * @var string tags table name.
 	 */
 	public $tagTable = 'Tag';
-
 	/**
-	 * Tag table field that contains tag name.
+	 * @var string tag table field that contains tag name.
 	 */
 	public $tagTableName = 'name';
-
 	/**
-	 * Tag table PK name.
+	 * @var string tag table PK name.
 	 */
 	public $tagTablePk = 'id';
-
 	/**
-	 * Tag to Model binding table name.
+	 * @var string tag to Model binding table name.
 	 * Defaults to `{model table name}Tag`.
 	 */
-	public $tagBindingTable = null;
-
+	public $tagBindingTable;
 	/**
-	 * Binding table tagId name.
+	 * @var string binding table tagId name.
 	 */
 	public $tagBindingTableTagId = 'tagId';
-
 	/**
-	 * Tag table count field. If null don't uses database
+	 * @var string|null tag table count field. If null don't uses database.
 	 */
-	public $tagTableCount = null;
-
+	public $tagTableCount;
 	/**
-	 * Binding table model FK name.
+	 * @var string binding table model FK name.
 	 * Defaults to `{model table name with first lowercased letter}Id`.
 	 */
-	public $modelTableFk = null;
-
+	public $modelTableFk;
 	/**
-	 * Create tags automatically or throw exception if tag does not exist
+	 * @var boolean which create tags automatically or throw exception if tag does not exist.
 	 */
 	public $createTagsAutomatically = true;
-
 	/**
-	 * Caching component Id
+	 * @var string|boolean caching component Id. If false don't use cache.
+	 * Defaults to false.
 	 */
-	public $cacheID = '';
+	public $cacheID = false;
 
 	private $tags = array();
 	private $originalTags = array();
-	private $_conn = null;
-
+	/**
+	 * @var CDbConnection
+	 */
+	private $_conn;
 	/**
 	 * @var CCache
 	 */
-	protected $cache = null;
-
+	protected $cache;
 	/**
-	 * Default scope. Used as filter in find, load, create or update tags
-	 *
-	 * @var array|CDbCriteria default scope criteria
+	 * @var array|CDbCriteria default scope criteria. Used as filter in find, load, create or update tags.
 	 */
 	public $scope = array();
-
 	/**
-	 * These values are added on inserting tag intoto DB.
-	 *
-	 * @var array
+	 * @var array these values are added on inserting tag into DB.
 	 */
 	public $insertValues = array();
-
 	/**
-	 * Scope CDbCriteria cache.
-	 *
-	 * @var CDbCriteria|null
+	 * @var CDbCriteria|null scope CDbCriteria cache.
 	 */
 	private $scopeCriteria = null;
 
 	/**
+	 * Get DB connection.
 	 * @return CDbConnection
 	 */
 	protected function getConnection() {
@@ -95,7 +85,6 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		}
 		return $this->_conn;
 	}
-
 	/**
 	 * @throws CException
 	 * @param CComponent $owner
@@ -103,7 +92,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	public function attach($owner) {
 		// Prepare cache component
-		$this->cache = Yii::app()->getComponent($this->cacheID);
+		if($this->cacheID!==false)
+			$this->cache = Yii::app()->getComponent($this->cacheID);
 		if(!($this->cache instanceof ICache)){
 			// If not set cache component, use dummy cache.
 			$this->cache = new CDummyCache;
@@ -111,20 +101,16 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		parent::attach($owner);
 	}
-
 	/**
 	 * Allows to print object.
-	 *
 	 * @return string
 	 */
-	function toString() {
+	public function toString() {
 		$this->loadTags();
 		return implode(', ', $this->tags);
 	}
-
 	/**
-	 * Get tag binding table name
-	 *
+	 * Get tag binding table name.
 	 * @access private
 	 * @return string
 	 */
@@ -134,10 +120,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		}
 		return $this->tagBindingTable;
 	}
-
 	/**
-	 * Get model table FK name
-	 *
+	 * Get model table FK name.
 	 * @access private
 	 * @return string
 	 */
@@ -149,27 +133,23 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		}
 		return $this->modelTableFk;
 	}
-
 	/**
-	 * Set one or more tags
-	 *
+	 * Set one or more tags.
 	 * @param string|array $tags
 	 * @return void
 	 */
-	function setTags($tags) {
+	public function setTags($tags) {
 		$tags = $this->toTagsArray($tags);
 		$this->tags = array_unique($tags);
 
 		return $this->getOwner();
 	}
-
 	/**
-	 * Add one or more tags
-	 *
+	 * Add one or more tags.
 	 * @param string|array $tags
 	 * @return void
 	 */
-	function addTags($tags) {
+	public function addTags($tags) {
 		$this->loadTags();
 
 		$tags = $this->toTagsArray($tags);
@@ -177,24 +157,20 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $this->getOwner();
 	}
-
 	/**
-	 * Alias of addTags()
-	 *
+	 * Alias of {@link addTags()}.
 	 * @param string|array $tags
 	 * @return void
 	 */
-	function addTag($tags) {
+	public function addTag($tags) {
 		return $this->addTags($tags);
 	}
-
 	/**
-	 * Remove one or more tags
-	 *
+	 * Remove one or more tags.
 	 * @param string|array $tags
 	 * @return void
 	 */
-	function removeTags($tags) {
+	public function removeTags($tags) {
 		$this->loadTags();
 
 		$tags = $this->toTagsArray($tags);
@@ -202,32 +178,25 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $this->getOwner();
 	}
-
 	/**
-	 * Remove one or more tags.
-	 * Alias of removeTags.
-	 *
+	 * Alias of {@link removeTags}.
 	 * @param string|array $tags
 	 * @return void
 	 */
-	function removeTag($tags) {
+	public function removeTag($tags) {
 		return $this->removeTags($tags);
 	}
-
 	/**
-	 * Remove all tags
-	 *
+	 * Remove all tags.
 	 * @return void
 	 */
-	function removeAllTags() {
+	public function removeAllTags() {
 		$this->loadTags();
 		$this->tags = array();
 		return $this->getOwner();
 	}
-
 	/**
 	 * Get default scope criteria.
-	 *
 	 * @return CDbCriteria
 	 */
 	protected function getScopeCriteria() {
@@ -241,31 +210,24 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			if($scope instanceof CDbCriteria){
 				$this->scopeCriteria = $scope;
 			}
-
 		}
 		return $this->scopeCriteria;
 	}
-
 	/**
-	 * Get tags
-	 *
+	 * Get tags.
 	 * @return array
 	 */
-	function getTags() {
+	public function getTags() {
 		$this->loadTags();
 		return $this->tags;
 	}
-
 	/**
-	 * Get current model's tags with counts
-	 *
+	 * Get current model's tags with counts.
 	 * @todo: quick implementation, rewrite!
-	 *
 	 * @param CDbCriteria $criteria
 	 * @return array
 	 */
-	function getTagsWithModelsCount($criteria = null) {
-
+	public function getTagsWithModelsCount($criteria = null) {
 		if(!($tags = $this->cache->get($this->getCacheKey().'WithModelsCount'))){
 
 			$builder = $this->getConnection()->getCommandBuilder();
@@ -305,10 +267,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $tags;
 	}
-
 	/**
-	 * Get tags array from comma separated tags string
-	 *
+	 * Get tags array from comma separated tags string.
 	 * @access private
 	 * @param string|array $tags
 	 * @return array
@@ -321,10 +281,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		array_walk($tags, array($this, 'trim'));
 		return $tags;
 	}
-
 	/**
-	 * Used as a callback to trim tags
-	 *
+	 * Used as a callback to trim tags.
 	 * @access private
 	 * @param string $item
 	 * @param string $key
@@ -333,10 +291,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	private function trim(&$item, $key) {
 		$item = trim($item);
 	}
-
 	/**
-	 * If we need to save tags
-	 *
+	 * If we need to save tags.
 	 * @access private
 	 * @return boolean
 	 */
@@ -348,14 +304,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return !empty($diff);
 	}
-
 	/**
 	 * Saves model tags on model save.
-	 *
 	 * @param CModelEvent $event
 	 * @throw Exception
 	 */
-	function afterSave($event) {
+	public function afterSave($event) {
 		if($this->needToSave()){
 
 			$builder = $this->getConnection()->getCommandBuilder();
@@ -437,29 +391,26 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		parent::afterSave($event);
 	}
-
 	/**
-	 * Reset cache used for getAllTags()
+	 * Reset cache used for {@link getAllTags()}.
 	 * @return void
 	 */
-	function resetAllTagsCache() {
+	public function resetAllTagsCache() {
 		$this->cache->delete('Taggable'.$this->getOwner()->tableName().'All');
 	}
-
 	/**
-	 * Reset cache used for getAllTagsWithModelsCount()
+	 * Reset cache used for {@link getAllTagsWithModelsCount()}.
 	 * @return void
 	 */
-	function resetAllTagsWithModelsCountCache() {
+	public function resetAllTagsWithModelsCountCache() {
 		$this->cache->delete('Taggable'.$this->getOwner()->tableName().'AllWithCount');
 	}
-
 	/**
 	 * Deletes tag bindings on model delete.
-	 *
 	 * @param CModelEvent $event
+	 * @return void
 	 */
-	function afterDelete($event) {
+	public function afterDelete($event) {
 		// delete all present tag bindings
 		$this->deleteTags();
 
@@ -468,11 +419,9 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		parent::afterDelete($event);
 	}
-
 	/**
-	 * Load tags into model
-	 *
-	 * @params array|CDbCriteria $criteria, defaults to null
+	 * Load tags into model.
+	 * @params array|CDbCriteria $criteria, defaults to null.
 	 * @access protected
 	 * @return void
 	 */
@@ -506,19 +455,15 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		$this->originalTags = $this->tags = $tags;
 	}
-
 	/**
 	 * Returns key for caching specific model tags.
-	 *
 	 * @return string
 	 */
 	private function getCacheKey() {
 		return $this->getCacheKeyBase().$this->getOwner()->primaryKey;
 	}
-
 	/**
 	 * Returns cache key base.
-	 *
 	 * @return string
 	 */
 	private function getCacheKeyBase() {
@@ -531,10 +476,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				$this->tagBindingTableTagId.
 				json_encode($this->scope);
 	}
-
 	/**
-	 * Get criteria to limit query by tags
-	 *
+	 * Get criteria to limit query by tags.
 	 * @access private
 	 * @param array $tags
 	 * @return CDbCriteria
@@ -561,10 +504,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $criteria;
 	}
-
 	/**
-	 * Get all possible tags for current model class
-	 *
+	 * Get all possible tags for current model class.
 	 * @param CDbCriteria $criteria
 	 * @return array
 	 */
@@ -587,10 +528,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $tags;
 	}
-
 	/**
 	 * Get all possible tags with models count for each for this model class.
-	 *
 	 * @param CDbCriteria $criteria
 	 * @return array
 	 */
@@ -635,14 +574,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $tags;
 	}
-
 	/**
 	 * Finds out if model has all tags specified.
-	 *
 	 * @param string|array $tags
 	 * @return boolean
 	 */
-	function hasTags($tags) {
+	public function hasTags($tags) {
 		$this->loadTags();
 
 		$tags = $this->toTagsArray($tags);
@@ -651,24 +588,20 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		}
 		return true;
 	}
-
 	/**
-	 * Alias of hasTags()
-	 *
+	 * Alias of {@link hasTags()}.
 	 * @param string|array $tags
 	 * @return boolean
 	 */
-	function hasTag($tags) {
+	public function hasTag($tags) {
 		return $this->hasTags($tags);
 	}
-
 	/**
-	 * Limit current AR query to have all tags specified
-	 *
+	 * Limit current AR query to have all tags specified.
 	 * @param string|array $tags
 	 * @return CActiveRecord
 	 */
-	function taggedWith($tags) {
+	public function taggedWith($tags) {
 		$tags = $this->toTagsArray($tags);
 
 		if(!empty($tags)){
@@ -678,20 +611,16 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $this->getOwner();
 	}
-
 	/**
-	 * taggedWith() alias
-	 *
+	 * Alias of {@link taggedWith()}.
 	 * @param string|array $tags
 	 * @return CActiveRecord
 	 */
-	function withTags($tags) {
+	public function withTags($tags) {
 		return $this->taggedWith($tags);
 	}
-
 	/**
-	 * Delete all present tag bindings
-	 *
+	 * Delete all present tag bindings.
 	 * @return void
 	 */
 	protected function deleteTags() {
@@ -748,14 +677,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		$builder->bindValues($command, $criteria->params);
 
 		return $command->execute();*/
-
 	}
-
 	/**
-	 * Creates a tag
-	 * Method is for future inheritance
-	 *
-	 * @param string $tag tag name
+	 * Creates a tag.
+	 * Method is for future inheritance.
+	 * @param string $tag tag name.
 	 * @return void
 	 */
 	protected function createTag($tag) {
@@ -772,12 +698,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		$builder->createInsertCommand($this->tagTable, $values)->execute();
 
 	}
-
 	/**
-	 * Updates counter information in database
-	 * Used if tagTableCount is not null
-	 *
-	 * @param int $count incremental ("1") or decremental ("-1") value
+	 * Updates counter information in database.
+	 * Used if {@link tagTableCount} is not null.
+	 * @param int $count incremental ("1") or decremental ("-1") value.
 	 * @return void
 	 */
 	protected function updateCount($count) {

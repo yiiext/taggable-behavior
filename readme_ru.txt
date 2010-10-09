@@ -32,7 +32,7 @@ function behaviors() {
             'tagTableCount' => 'count',
             // ID тега в таблице-связке
             'tagBindingTableTagId' => 'tagId',
-            // ID компонента, реализующего кеширование.
+            // ID компонента, реализующего кеширование. Если false кеширование не происходит.
             // По умолчанию ID равен false.
             'cacheID' => 'cache',
 

@@ -33,8 +33,8 @@ function behaviors() {
             'tagTableCount' => 'count',
             // Tag binding table tag ID
             'tagBindingTableTagId' => 'tagId',
-            // Caching component ID.
-            // false by default.
+            // Caching component ID. If false don't use cache.
+            // Defaults to false.
             'cacheID' => 'cache',
 
             // Save nonexisting tags.

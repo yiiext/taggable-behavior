@@ -254,7 +254,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			}
 
 			if($criteria){
-				$findCriteria->wergeWith($criteria);
+				$findCriteria->mergeWith($criteria);
 			}
 
 			$tags = $builder->createFindCommand(
@@ -440,7 +440,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				)
 			));
 			if($criteria){
-				$findCriteria->wergeWith($criteria);
+				$findCriteria->mergeWith($criteria);
 			}
 			if($this->getScopeCriteria()){
 				$findCriteria->mergeWith($this->getScopeCriteria());
@@ -564,7 +564,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				$tagsCriteria->mergeWith($criteria);
 
 			if($this->getScopeCriteria())
-				$tagsCriteria->wergeWith($this->getScopeCriteria());
+				$tagsCriteria->mergeWith($this->getScopeCriteria());
 
 
 			$tags = $builder->createFindCommand($this->tagTable, $tagsCriteria)->queryAll();

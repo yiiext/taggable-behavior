@@ -8,7 +8,7 @@
 /**
  * Provides tagging ability for a model.
  *
- * @version 1.3
+ * @version 1.4
  * @package yiiext.behaviors.model.taggable
  */
 class ETaggableBehavior extends CActiveRecordBehavior {

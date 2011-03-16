@@ -1,3 +1,7 @@
+1.5
+---
+- updateCount now uses proper PK name (RSol)
+
 1.4
 ----
 - Change CacheID defaults to false. If false don't use cache.

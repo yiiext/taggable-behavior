@@ -8,7 +8,7 @@
 /**
  * Provides tagging ability for a model.
  *
- * @version 1.4
+ * @version 1.5
  * @package yiiext.behaviors.model.taggable
  */
 class ETaggableBehavior extends CActiveRecordBehavior {
@@ -468,13 +468,13 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	private function getCacheKeyBase() {
 		return 'Taggable'.
-				$this->getOwner()->tableName().
-				$this->tagTable.
-				$this->tagBindingTable.
-				$this->tagTableName.
-				$this->getModelTableFkName().
-				$this->tagBindingTableTagId.
-				json_encode($this->scope);
+			$this->getOwner()->tableName().
+			$this->tagTable.
+			$this->tagBindingTable.
+			$this->tagTableName.
+			$this->getModelTableFkName().
+			$this->tagBindingTableTagId.
+			json_encode($this->scope);
 	}
 	/**
 	 * Get criteria to limit query by tags.
@@ -493,8 +493,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			for($i = 0, $count = count($tags); $i < $count; $i++){
 				$tag = $conn->quoteValue($tags[$i]);
 				$criteria->join .=
-						"JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
-                     JOIN {$this->tagTable} tag$i ON tag$i.{$this->tagTablePk} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
+					"JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
+					JOIN {$this->tagTable} tag$i ON tag$i.{$this->tagTablePk} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
 			}
 		}
 
@@ -637,46 +637,6 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				$this->getOwner()->primaryKey
 			)
 		)->execute();
-
-		/*$criteria = new CDbCriteria(array(
-			'alias' => 'd',
-			'select' => 'd',
-			'condition' => "d.{$this->getModelTableFkName()} = :owner_id ",
-			'params' => array(
-				':owner_id' => $this->getOwner()->primaryKey
-			),
-			'join' => "LEFT JOIN {$this->tagTable} t ON t.{$this->tagTablePk} = d.{$this->tagBindingTableTagId}",
-		));
-
-		if ($this->getScopeCriteria()) {
-			$criteria->mergeWith($this->getScopeCriteria());
-		}
-
-		$builder = $this->getConnection()->getCommandBuilder();
-
-		if ($criteria->alias != '') {
-			$alias = $criteria->alias;
-		}
-		$alias = $builder->getSchema()->quoteTableName($alias);
-
-		$table = $this->tagBindingTable;
-		$table = $builder->getSchema()->getTable($tableName = $table);
-		$sql = "DELETE FROM {$table->rawName}";
-
-		$select = is_array($criteria->select) ? implode(', ', $criteria->select) : $criteria->select;
-		$sql = "DELETE {$select} FROM {$table->rawName} $alias";
-
-		$sql = $builder->applyJoin($sql, $criteria->join);
-		$sql = $builder->applyCondition($sql, $criteria->condition);
-		$sql = $builder->applyGroup($sql, $criteria->group);
-		$sql = $builder->applyHaving($sql, $criteria->having);
-		$sql = $builder->applyOrder($sql, $criteria->order);
-		$sql = $builder->applyLimit($sql, $criteria->limit, $criteria->offset);
-
-		$command = $this->getConnection()->createCommand($sql);
-		$builder->bindValues($command, $criteria->params);
-
-		return $command->execute();*/
 	}
 	/**
 	 * Creates a tag.
@@ -710,12 +670,13 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			$conn->createCommand(
 				sprintf(
 					"UPDATE %s
-                    SET %s = %s + %s
-                    WHERE id in (SELECT %s FROM %s WHERE %s = %d)",
+					SET %s = %s + %s
+					WHERE %s in (SELECT %s FROM %s WHERE %s = %d)",
 					$this->tagTable,
 					$this->tagTableCount,
 					$this->tagTableCount,
 					$count,
+					$this->tagTablePk,
 					$this->tagBindingTableTagId,
 					$this->getTagBindingTableName(),
 					$this->getModelTableFkName(),

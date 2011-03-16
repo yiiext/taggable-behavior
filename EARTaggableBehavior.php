@@ -4,7 +4,7 @@
  *
  * Allows to use AR objects as tags.
  *
- * @version 1.4
+ * @version 1.5
  * @author 5е-1
  * @link http://code.google.com/p/yiiext/
  */

@@ -3,7 +3,7 @@
  * ETaggableBehavior class file.
  *
  * @author Alexander Makarov
- * @link http://code.google.com/p/yiiext/
+ * @link https://github.com/yiiext/
  */
 /**
  * Provides tagging ability for a model.
@@ -29,6 +29,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * Defaults to `{model table name}Tag`.
 	 */
 	public $tagBindingTable;
+	/**
+	 * @var CDbExpression Custom expression for finding the tag if we are using magic fields
+	 */
+	public $tagTableCondition;
 	/**
 	 * @var string binding table tagId name.
 	 */
@@ -320,9 +324,14 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 					$findCriteria = new CDbCriteria(array(
 						'select' => "t.".$this->tagTablePk,
-						'condition' => "t.{$this->tagTableName} = :tag ",
 						'params' => array(':tag' => $tag),
 					));
+					
+					if (! $this->tagTableCondition instanceof CDbExpression)
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
+					else
+						$findCriteria->addCondition($this->tagTableCondition->__toString());
+					
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}
@@ -351,9 +360,14 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					// try to get existing tag
 					$findCriteria = new CDbCriteria(array(
 						'select' => "t.".$this->tagTablePk,
-						'condition' => "t.{$this->tagTableName} = :tag ",
 						'params' => array(':tag' => $tag),
 					));
+					
+					if (! $this->tagTableCondition instanceof CDbExpression)
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
+					else
+						$findCriteria->addCondition($this->tagTableCondition->__toString());
+						
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}

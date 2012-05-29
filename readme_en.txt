@@ -21,7 +21,7 @@ function behaviors() {
             // Cross-table that stores tag-model connections.
             // By default it's your_model_tableTag
             'tagBindingTable' => 'PostTag',
-            // Foreign key in cross-table.
+            // Foreign key field field in cross-table.
             // By default it's your_model_tableId
             'modelTableFk' => 'post_id',
             // Tag table PK field

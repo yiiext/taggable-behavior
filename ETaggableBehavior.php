@@ -38,7 +38,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	public $tagTableCount;
 	/**
-	 * @var string binding table model FK name.
+	 * @var string binding table model FK field name.
 	 * Defaults to `{model table name with first lowercased letter}Id`.
 	 */
 	public $modelTableFk;

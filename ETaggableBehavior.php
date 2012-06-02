@@ -32,7 +32,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	/**
 	 * @var CDbExpression Custom expression for finding the tag if we are using magic fields
 	 */
-	public $tagTableCondition = NULL;
+	public $tagTableCondition;
 	/**
 	 * @var string binding table tagId name.
 	 */
@@ -327,10 +327,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'params' => array(':tag' => $tag),
 					));
 					
-					if (! $this->tagTableCondition instanceof CDbExpression)
-						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
-					else
+					if ($this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
+					else
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
@@ -363,10 +363,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'params' => array(':tag' => $tag),
 					));
 					
-					if (! $this->tagTableCondition instanceof CDbExpression)
-						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
-					else
+					if ($this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
+					else
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 						
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
@@ -445,10 +445,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		if(!($tags = $this->cache->get($this->getCacheKey()))){
 
-			if (! $this->tagTableCondition instanceof CDbExpression){
-				$select = "t.{$this->tagTableName} as `name`";
-			} else {
+			if ($this->tagTableCondition instanceof CDbExpression){
 				$select = $this->tagTableCondition->__toString();
+			} else {
+				$select = "t.{$this->tagTableName} as `name`";
 			}
 			
 			$findCriteria = new CDbCriteria(array(

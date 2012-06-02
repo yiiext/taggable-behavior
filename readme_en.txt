@@ -21,12 +21,12 @@ function behaviors() {
             // Cross-table that stores tag-model connections.
             // By default it's your_model_tableTag
             'tagBindingTable' => 'PostTag',
-            // Foreign key field field in cross-table.
+            // Foreign key field in cross-table.
             // By default it's your_model_tableId
             'modelTableFk' => 'post_id',
             // tagTableCondition - empty by default. Can be used in cases where e.g. the tag is composed of 
             // two fields and a custom search expression is needed to find the tag. Example for user table:
-            // 'tagTableCondition' => new CDbExpression("CONCAT(t.name,' ',t.surname) = :tag "),
+            // 'tagTableCondition' => new CDbExpression("CONCAT(t.name,' ',t.surname) "),
             // Tag table PK field
             'tagTablePk' => 'id',
             // Tag name field

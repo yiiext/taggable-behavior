@@ -32,7 +32,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	/**
 	 * @var CDbExpression Custom expression for finding the tag if we are using magic fields
 	 */
-	public $tagTableCondition;
+	public $tagTableCondition = NULL;
 	/**
 	 * @var string binding table tagId name.
 	 */
@@ -445,14 +445,21 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		if(!($tags = $this->cache->get($this->getCacheKey()))){
 
+			if (! $this->tagTableCondition instanceof CDbExpression){
+				$select = "t.{$this->tagTableName} as `name`";
+			} else {
+				$select = $this->tagTableCondition->__toString();
+			}
+			
 			$findCriteria = new CDbCriteria(array(
-				'select' => "t.{$this->tagTableName} as `name`",
+				'select' => $select,
 				'join' => "INNER JOIN {$this->getTagBindingTableName()} et ON t.{$this->tagTablePk} = et.{$this->tagBindingTableTagId} ",
 				'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 				'params' => array(
 					':ownerid' => $this->getOwner()->primaryKey,
 				)
 			));
+			
 			if($criteria){
 				$findCriteria->mergeWith($criteria);
 			}

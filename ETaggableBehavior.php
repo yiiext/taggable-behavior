@@ -616,13 +616,14 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * @return CActiveRecord
 	 */
 	public function taggedWith($tags) {
-		$tags = $this->toTagsArray($tags);
-
-		if(!empty($tags)){
-			$criteria = $this->getFindByTagsCriteria($tags);
-			$this->getOwner()->getDbCriteria()->mergeWith($criteria);
-		}
-
+        if (!empty($tags))
+        {
+            $tags = $this->toTagsArray($tags);
+            if(!empty($tags)){
+                $criteria = $this->getFindByTagsCriteria($tags);
+                $this->getOwner()->getDbCriteria()->mergeWith($criteria);
+            }
+        }
 		return $this->getOwner();
 	}
 	/**

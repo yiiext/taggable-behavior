@@ -560,6 +560,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					$this->tagTableName,
 					$this->tagTableCount
 				);
+                $tagsCriteria->join = sprintf(
+                    "JOIN `%s` et ON t.{$this->tagTablePk} = et.%s",
+                    $this->getTagBindingTableName(),
+                    $this->tagBindingTableTagId
+                );
 			}
 			else{
 				$tagsCriteria->select = sprintf(
@@ -576,6 +581,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 			if($criteria!==null)
 				$tagsCriteria->mergeWith($criteria);
+
 
 			if($this->getScopeCriteria())
 				$tagsCriteria->mergeWith($this->getScopeCriteria());

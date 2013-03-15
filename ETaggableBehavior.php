@@ -107,7 +107,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			// If not set cache component, use dummy cache.
 			$this->cache = new CDummyCache;
 		}
-		
+
 		if (null === $this->ownerPk)
 			$this->ownerPk = $this->ownerPk;
 
@@ -334,12 +334,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'select' => "t.".$this->tagTablePk,
 						'params' => array(':tag' => $tag),
 					));
-					
+
 					if (! $this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					else
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
-					
+
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}
@@ -370,12 +370,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'select' => "t.".$this->tagTablePk,
 						'params' => array(':tag' => $tag),
 					));
-					
+
 					if (! $this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					else
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
-						
+
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}
@@ -399,7 +399,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					$builder->createInsertCommand(
 						$this->getTagBindingTableName(),
 						array(
-							$this->getModelTableFkName() => $this->ownerPk,
+							$this->getModelTableFkName() => $this->owner->{$this->ownerPk},
 							$this->tagBindingTableTagId => $tagId
 						)
 					)->execute();

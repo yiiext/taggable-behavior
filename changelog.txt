@@ -1,3 +1,7 @@
+1.6?
+---
+- Fixed: correctly handle models that are using table prefixes {{ }}
+
 1.5
 ---
 - updateCount now uses proper PK name (RSol)

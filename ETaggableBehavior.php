@@ -494,9 +494,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * Get criteria to limit query by tags.
 	 * @access private
 	 * @param array $tags
+	 * @param bool $matchAll. When true, must match all tags. When false, must match at least one tag.
 	 * @return CDbCriteria
 	 */
-	protected function getFindByTagsCriteria($tags) {
+	protected function getFindByTagsCriteria($tags, $matchAll = true) {
 		$criteria = new CDbCriteria();
 
 		$pk = $this->getOwner()->tableSchema->primaryKey;
@@ -504,11 +505,24 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		if(!empty($tags)){
 			$conn = $this->getConnection();
 			$criteria->select = 't.*';
-			for($i = 0, $count = count($tags); $i < $count; $i++){
-				$tag = $conn->quoteValue($tags[$i]);
+			
+			if ($matchAll) {
+				for($i = 0, $count = count($tags); $i < $count; $i++){
+					$tag = $conn->quoteValue($tags[$i]);
+					$criteria->join .=
+						"JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
+						JOIN {$this->tagTable} tag$i ON tag$i.{$this->tagTablePk} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
+				}
+			} else {
+				$tagsList = array();
+				for($i = 0, $count = count($tags); $i < $count; $i++){
+					$tagsList[] = $conn->quoteValue($tags[$i]);
+				}
+			   
 				$criteria->join .=
 					"JOIN {$this->getTagBindingTableName()} bt$i ON t.{$pk} = bt$i.{$this->getModelTableFkName()}
-					JOIN {$this->tagTable} tag$i ON tag$i.{$this->tagTablePk} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` = $tag";
+					JOIN {$this->tagTable} tag$i ON tag$i.{$this->tagTablePk} = bt$i.{$this->tagBindingTableTagId} AND tag$i.`{$this->tagTableName}` IN (" . implode(',', $tagsList) . ") ";
+				$criteria->group = "t.{$pk}";
 			}
 		}
 
@@ -611,15 +625,16 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		return $this->hasTags($tags);
 	}
 	/**
-	 * Limit current AR query to have all tags specified.
+	 * Limit current AR query to have all or any tags specified.
 	 * @param string|array $tags
+	 * @param bool $matchAll. When true, must match all tags. When false, must match at least one tag.
 	 * @return CActiveRecord
 	 */
-	public function taggedWith($tags) {
+	public function taggedWith($tags, $matchAll = true) {
 		$tags = $this->toTagsArray($tags);
 
 		if(!empty($tags)){
-			$criteria = $this->getFindByTagsCriteria($tags);
+			$criteria = $this->getFindByTagsCriteria($tags, $matchAll);
 			$this->getOwner()->getDbCriteria()->mergeWith($criteria);
 		}
 
@@ -627,11 +642,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	}
 	/**
 	 * Alias of {@link taggedWith()}.
-	 * @param string|array $tags
+	 * @@param string|array $tags
+	 * @param bool $matchAll. When true, must match all tags. When false, must match at least one tag.
 	 * @return CActiveRecord
 	 */
-	public function withTags($tags) {
-		return $this->taggedWith($tags);
+	public function withTags($tags, $matchAll = true) {
+		return $this->taggedWith($tags, $matchAll);
 	}
 	/**
 	 * Delete all present tag bindings.

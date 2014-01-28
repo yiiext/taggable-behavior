@@ -122,7 +122,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	private function getTagBindingTableName() {
 		if($this->tagBindingTable === null){
-			$this->tagBindingTable = $this->getOwner()->tableName().'Tag';
+			$this->tagBindingTable = '{{'.preg_replace('/{{(.*?)}}/','\1',$this->getOwner()->tableName()).'Tag}}';
 		}
 		return $this->tagBindingTable;
 	}
@@ -133,7 +133,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	private function getModelTableFkName() {
 		if($this->modelTableFk === null){
-			$tableName = $this->getOwner()->tableName();
+			$tableName = preg_replace('/{{(.*?)}}/','\1',$this->getOwner()->tableName());
 			$tableName[0] = strtolower($tableName[0]);
 			$this->modelTableFk = $tableName.'Id';
 		}

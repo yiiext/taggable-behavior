@@ -143,8 +143,6 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * @return void
 	 */
 	public function setTags($tags) {
-		$this->loadTags();
-		
 		$tags = $this->toTagsArray($tags);
 		$this->tags = array_unique($tags);
 
@@ -285,7 +283,6 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		}
 
 		array_walk($tags, array($this, 'trim'));
-		$tags = array_filter($tags, 'strlen');
 		return $tags;
 	}
 	/**
@@ -358,7 +355,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			// add new tag bindings and tags if there are any
 			if(!empty($this->tags)){
 				foreach($this->tags as $tag){
-					if(empty($tag)) continue;
+					if(empty($tag)) return;
 
 					// try to get existing tag
 					$findCriteria = new CDbCriteria(array(

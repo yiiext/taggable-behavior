@@ -1,3 +1,9 @@
+1.6?
+---
+- Fixed: setTags() did not call loadTags(). Furtheron, neededSave() would re-save even though no tags had changed, or not save when empty setTags(array()) was called. (marcovtwout)
+- Fixed: in for loop while saving in afterSave(), don't abort whem empty tag is found (marcovtwout)
+- Remove empty tags before handling (marcovtwout)
+
 1.5
 ---
 - updateCount now uses proper PK name (RSol)

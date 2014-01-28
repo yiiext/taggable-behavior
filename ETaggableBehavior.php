@@ -10,8 +10,6 @@
  *
  * @version 1.5
  * @package yiiext.behaviors.model.taggable
- *
- * -- Includes changes by MWO --
  */
 class ETaggableBehavior extends CActiveRecordBehavior {
 	/**

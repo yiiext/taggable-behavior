@@ -1,6 +1,7 @@
 1.6?
 ---
 - Fixed: correctly handle models that are using table prefixes {{ }} (marcovtwout)
+- New: pass additional parameter to taggedWith() which allows matching ANY tag instead of ALL tags (marcovtwout)
 
 1.5
 ---

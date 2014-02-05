@@ -1,6 +1,6 @@
 1.6?
 ---
-- Fixed: correctly handle models that are using table prefixes {{ }}
+- Fixed: correctly handle models that are using table prefixes {{ }} (marcovtwout)
 
 1.5
 ---

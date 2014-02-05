@@ -1,7 +1,11 @@
-1.6?
+1.6
 ---
-- Fixed: correctly handle models that are using table prefixes {{ }} (marcovtwout)
-- New: pass additional parameter to taggedWith() which allows matching ANY tag instead of ALL tags (marcovtwout)
+
+- Fixed handling of models when using table prefixes {{ }} (marcovtwout)
+- Fixed setTags() was not calling loadTags(). Further on, neededSave() would re-save even though no tags had changed, or not save when empty setTags(array()) was called (marcovtwout)
+- Fixed check for empty tag in the for loop while saving in afterSave() (marcovtwout)
+- Remove empty tags before handling (marcovtwout)
+- Added ability to pass additional parameter to taggedWith() which allows matching ANY tag instead of ALL tags (marcovtwout)
 
 1.5
 ---

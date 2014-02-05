@@ -1,5 +1,5 @@
-1.6
----
+1.5.1
+-----
 
 - Fixed handling of models when using table prefixes {{ }} (marcovtwout)
 - Fixed setTags() was not calling loadTags(). Further on, neededSave() would re-save even though no tags had changed, or not save when empty setTags(array()) was called (marcovtwout)

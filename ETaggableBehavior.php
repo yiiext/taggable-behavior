@@ -330,10 +330,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'params' => array(':tag' => $tag),
 					));
 					
-					if (! $this->tagTableCondition instanceof CDbExpression)
-						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
-					else
+					if ($this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
+					else
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
@@ -366,10 +366,10 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'params' => array(':tag' => $tag),
 					));
 					
-					if (! $this->tagTableCondition instanceof CDbExpression)
-						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
-					else
+					if ($this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
+					else
+						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 						
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
@@ -448,14 +448,21 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		if(!($tags = $this->cache->get($this->getCacheKey()))){
 
+			if ($this->tagTableCondition instanceof CDbExpression){
+				$select = $this->tagTableCondition->__toString();
+			} else {
+				$select = "t.{$this->tagTableName} as `name`";
+			}
+			
 			$findCriteria = new CDbCriteria(array(
-				'select' => "t.{$this->tagTableName} as `name`",
+				'select' => $select,
 				'join' => "INNER JOIN {$this->getTagBindingTableName()} et ON t.{$this->tagTablePk} = et.{$this->tagBindingTableTagId} ",
 				'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 				'params' => array(
 					':ownerid' => $this->getOwner()->primaryKey,
 				)
 			));
+			
 			if($criteria){
 				$findCriteria->mergeWith($criteria);
 			}

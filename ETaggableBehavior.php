@@ -559,10 +559,15 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 			if($this->tagTableCount !== null){
 				$tagsCriteria->select = sprintf(
-					"t.%s as `name`, %s as `count`",
+                    "distinct(t.%s) as `name`,%s as `count`",
 					$this->tagTableName,
 					$this->tagTableCount
 				);
+                $tagsCriteria->join = sprintf(
+                    "JOIN `%s` et ON t.{$this->tagTablePk} = et.%s",
+                    $this->getTagBindingTableName(),
+                    $this->tagBindingTableTagId
+                );
 			}
 			else{
 				$tagsCriteria->select = sprintf(
@@ -579,6 +584,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 			if($criteria!==null)
 				$tagsCriteria->mergeWith($criteria);
+
 
 			if($this->getScopeCriteria())
 				$tagsCriteria->mergeWith($this->getScopeCriteria());
@@ -619,13 +625,14 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * @return CActiveRecord
 	 */
 	public function taggedWith($tags) {
-		$tags = $this->toTagsArray($tags);
-
-		if(!empty($tags)){
-			$criteria = $this->getFindByTagsCriteria($tags);
-			$this->getOwner()->getDbCriteria()->mergeWith($criteria);
-		}
-
+        if (!empty($tags))
+        {
+            $tags = $this->toTagsArray($tags);
+            if(!empty($tags)){
+                $criteria = $this->getFindByTagsCriteria($tags);
+                $this->getOwner()->getDbCriteria()->mergeWith($criteria);
+            }
+        }
 		return $this->getOwner();
 	}
 	/**

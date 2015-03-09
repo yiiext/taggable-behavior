@@ -522,6 +522,59 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		return $criteria;
 	}
 	/**
+	 * Get criteria to limit query by tag key
+	 * @param int $tagId
+	 * @return CDbCriteria 
+	 */
+	protected function getFindByTagIdCriteria($tagId){
+		$criteria = new CDbCriteria();
+		
+		if(!empty($tagId)){
+			$pk = $this->getOwner()->tableSchema->primaryKey;
+			$conn = $this->getConnection();
+			$tagId = $conn->quoteValue($tagId);
+			$criteria->select = 't.*';
+			$criteria->join =
+				"JOIN {$this->getTagBindingTableName()} bt ON t.{$pk} = bt.{$this->getModelTableFkName()} AND bt.{$this->tagBindingTableTagId} = $tagId";
+		}
+		
+		if($this->getScopeCriteria()){
+			$criteria->mergeWith($this->getScopeCriteria());
+		}
+		return $criteria;
+	}
+	
+	/**
+	 * Get criteria to limit query by tags keys
+	 * @param array $tagsIds
+	 * @return CDbCriteria 
+	 */
+	protected function getFindByTagsIdsCriteria($tagsIds){
+		$criteria = new CDbCriteria();
+		
+		if(!empty($tagsIds)){
+		$condition = 'IN (';
+			$conn = $this->getConnection();
+			foreach($tagsIds as $tagId){
+				$tagId = $conn->quoteValue($tagId);
+				$condition .= $tagId.',';
+			}
+			$condition = rtrim($condition,',').')';
+				$pk = $this->getOwner()->tableSchema->primaryKey;
+			$criteria->select = 't.*';
+			$criteria->join =
+				"JOIN {$this->getTagBindingTableName()} bt ON t.{$pk} = bt.{$this->getModelTableFkName()} AND bt.{$this->tagBindingTableTagId} $condition";
+			$criteria->group = $this->getModelTableFkName();
+			$criteria->having = 'COUNT(*) = ' . count($tagsIds);
+		}
+		
+		if($this->getScopeCriteria()){
+			$criteria->mergeWith($this->getScopeCriteria());
+		}
+		return $criteria;
+	}
+		
+	/**
 	 * Get all possible tags for current model class.
 	 * @param CDbCriteria $criteria
 	 * @return array
@@ -628,6 +681,26 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 
 		return $this->getOwner();
 	}
+		
+		/**
+	 * Limit current AR query to have all tags specified by their keys.
+	 * @param int|array $tags
+	 * @return CActiveRecord
+	 */
+	public function taggedWithIds($tags) {
+		$tags = $this->toTagsArray($tags);
+
+		if(!empty($tags)){
+			$criteria = count($tags>1) ?
+							$this->getFindByTagsIdsCriteria($tags) :
+							$this->getFindByTagIdCriteria($tags[0]);
+						
+			$this->getOwner()->getDbCriteria()->mergeWith($criteria);
+		}
+
+		return $this->getOwner();
+	}
+		
 	/**
 	 * Alias of {@link taggedWith()}.
 	 * @param string|array $tags
@@ -636,6 +709,16 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	public function withTags($tags) {
 		return $this->taggedWith($tags);
 	}
+		
+		/**
+	 * Alias of {@link taggedWithIds()}.
+	 * @param int|array $tags
+	 * @return CActiveRecord
+	 */
+	public function withTagsIds($tags) {
+		return $this->taggedWithIds($tags);
+	}
+		
 	/**
 	 * Delete all present tag bindings.
 	 * @return void
@@ -647,8 +730,8 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		$conn->createCommand(
 			sprintf(
 				"DELETE
-                 FROM `%s`
-                 WHERE %s = %d",
+				 FROM `%s`
+				 WHERE %s = %d",
 				$this->getTagBindingTableName(),
 				$this->getModelTableFkName(),
 				$this->getOwner()->primaryKey

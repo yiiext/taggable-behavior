@@ -42,6 +42,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 */
 	public $tagTableCount;
 	/**
+	 * Owner table PK
+	 * @var string
+	 */
+	public $ownerPk;
+	/**
 	 * @var string binding table model FK field name.
 	 * Defaults to `{model table name with first lowercased letter}Id`.
 	 */
@@ -102,6 +107,9 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 			// If not set cache component, use dummy cache.
 			$this->cache = new CDummyCache;
 		}
+
+		if (null === $this->ownerPk)
+			$this->ownerPk = $this->ownerPk;
 
 		parent::attach($owner);
 	}
@@ -244,7 +252,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					'join' => "INNER JOIN {$this->getTagBindingTableName()} et on t.{$this->tagTablePk} = et.{$this->tagBindingTableTagId} ",
 					'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 					'params' => array(
-						':ownerid' => $this->getOwner()->primaryKey,
+						':ownerid' => $this->ownerPk,
 					)
 				));
 			} else{
@@ -254,7 +262,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 					'group' => 't.'.$this->tagTablePk,
 					'params' => array(
-						':ownerid' => $this->getOwner()->primaryKey,
+						':ownerid' => $this->ownerPk,
 					)
 				));
 			}
@@ -329,12 +337,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'select' => "t.".$this->tagTablePk,
 						'params' => array(':tag' => $tag),
 					));
-					
+
 					if (! $this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					else
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
-					
+
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}
@@ -365,12 +373,12 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 						'select' => "t.".$this->tagTablePk,
 						'params' => array(':tag' => $tag),
 					));
-					
+
 					if (! $this->tagTableCondition instanceof CDbExpression)
 						$findCriteria->addCondition("t.{$this->tagTableName} = :tag ");
 					else
 						$findCriteria->addCondition($this->tagTableCondition->__toString());
-						
+
 					if($this->getScopeCriteria()){
 						$findCriteria->mergeWith($this->getScopeCriteria());
 					}
@@ -394,7 +402,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					$builder->createInsertCommand(
 						$this->getTagBindingTableName(),
 						array(
-							$this->getModelTableFkName() => $this->getOwner()->primaryKey,
+							$this->getModelTableFkName() => $this->owner->{$this->ownerPk},
 							$this->tagBindingTableTagId => $tagId
 						)
 					)->execute();
@@ -453,7 +461,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 				'join' => "INNER JOIN {$this->getTagBindingTableName()} et ON t.{$this->tagTablePk} = et.{$this->tagBindingTableTagId} ",
 				'condition' => "et.{$this->getModelTableFkName()} = :ownerid ",
 				'params' => array(
-					':ownerid' => $this->getOwner()->primaryKey,
+					':ownerid' => $this->ownerPk,
 				)
 			));
 			if($criteria){
@@ -477,7 +485,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	 * @return string
 	 */
 	private function getCacheKey() {
-		return $this->getCacheKeyBase().$this->getOwner()->primaryKey;
+		return $this->getCacheKeyBase().$this->ownerPk;
 	}
 	/**
 	 * Returns cache key base.
@@ -651,7 +659,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
                  WHERE %s = %d",
 				$this->getTagBindingTableName(),
 				$this->getModelTableFkName(),
-				$this->getOwner()->primaryKey
+				$this->ownerPk
 			)
 		)->execute();
 	}
@@ -697,7 +705,7 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 					$this->tagBindingTableTagId,
 					$this->getTagBindingTableName(),
 					$this->getModelTableFkName(),
-					$this->getOwner()->primaryKey
+					$this->ownerPk
 				)
 			)->execute();
 		}

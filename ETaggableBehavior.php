@@ -80,6 +80,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 	private $scopeCriteria = null;
 
 	/**
+	 * @var bool different case-variants of the same tag are accepted
+	 */ 
+	public $caseSensitive = false;
+
+	/**
 	 * Get DB connection.
 	 * @return CDbConnection
 	 */
@@ -146,7 +151,11 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		$this->loadTags();
 		
 		$tags = $this->toTagsArray($tags);
-		$this->tags = array_unique($tags);
+		if($this->caseSensitive) {
+			$this->tags = array_unique($tags);
+		} else {
+			$this->tags = array_intersect_key($tags, array_unique(array_map('strtolower', $tags)));
+		}
 
 		return $this->getOwner();
 	}
@@ -159,7 +168,13 @@ class ETaggableBehavior extends CActiveRecordBehavior {
 		$this->loadTags();
 
 		$tags = $this->toTagsArray($tags);
-		$this->tags = array_unique(array_merge($this->tags, $tags));
+		$mergedTags = array_merge($this->tags, $tags);
+		
+		if($this->caseSensitive) {
+			$this->tags = array_unique($mergedTags);
+		} else {
+			$this->tags = array_intersect_key($mergedTags, array_unique(array_map('strtolower', $mergedTags)));
+		}
 
 		return $this->getOwner();
 	}
